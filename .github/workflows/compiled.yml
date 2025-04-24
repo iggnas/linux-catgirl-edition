@@ -1,0 +1,51 @@
+name: Catgirl Edition Compiled
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build and Package
+    runs-on: self-hosted
+    container:
+      image: archlinux:latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies and create build user
+        run: |
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm base-devel git zip bc cpio pahole python clang llvm lld
+          useradd -m builduser
+          echo "builduser ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+      - name: Fix workspace permissions
+        run: |
+          chown -R builduser:builduser "$GITHUB_WORKSPACE"
+
+      - name: Build linux-catgirl-edition via makepkg
+        run: | # The sed command is for turning on CI mode
+          sudo -u builduser bash -c '
+            cd "$GITHUB_WORKSPACE"
+            sed -i \
+                -e 's/: "${_localmodcfg:=yes}"/: "${_localmodcfg:=no}"/' \
+                -e 's/: "${_processor_opt:=}"/: "${_processor_opt:=GENERIC_V3}"/' \
+                -e 's/: "${_use_auto_optimization:=yes}"/: "${_use_auto_optimization:=no}"/' \
+                -e 's/: "${_unattended_make_prepare:=no}"/: "${_unattended_make_prepare:=yes}"/' \
+                PKGBUILD
+            makepkg -scf --cleanbuild --skipchecksums
+          '
+
+      - name: .zip linux-catgirl-edition directory
+        run: |
+          zip -r linux-catgirl-edition.zip . -x "*.git*" "*.github*" "README.md"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-catgirl-edition-compiled
+          path: linux-catgirl-edition.zip
