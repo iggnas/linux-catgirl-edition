@@ -37,6 +37,7 @@ jobs:
             sed -i 's|: "${_unattended_make_prepare:=no}"|: "${_unattended_make_prepare:=yes}"|' PKGBUILD
             sed -i 's|: "${_makenconfig:=yes}"|: "${_makenconfig:=no}"|' PKGBUILD
             sed -i 's|: "${_no_32bit=yes}"|: "${_no_32bit2:=no}"|' PKGBUILD
+            sed -i 's|: "${_no_compressed_initramfs:=yes}"|: "${_no_compressed_initramfs:=no}"|' PKGBUILD
             makepkg -scf --cleanbuild --skipchecksums
           EOF
 
