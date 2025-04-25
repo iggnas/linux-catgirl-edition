@@ -228,7 +228,7 @@ _minor=4
 # setting to `no` is more secure in the event that something obtains root, as any malicious actors cannot simply compile their own kernel
 # object, and the kernel will reject kernel objects that are incompatable with the kernel
 #
-# as for performance and size advantages, enabling this will enable the TRIM_UNUSED_KSYMS
+# as for performance and size advantages, enabling this alongside `_disable_debugging` will enable the TRIM_UNUSED_KSYMS
 # option which allows the compiler (even better with LTO) to optimize more
 #
 # generally, you want to leave this enabled. this can be safely disabled if you dont use any OOT modules
