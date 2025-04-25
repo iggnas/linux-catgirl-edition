@@ -533,9 +533,6 @@ makedepends=(
   tar
   xz
   zstd
-  clang
-  llvm
-  lld
 )
 
 _patchsource="https://raw.githubusercontent.com/cachyos/kernel-patches/master/${_major}"
@@ -1072,10 +1069,6 @@ _package-headers() {
     if [[ $_package_headers == "no" ]]; then
         echo "skipping header packaging"
         return 0
-    fi
-
-    if _is_lto_kernel; then
-        depends+=(clang llvm lld)
     fi
 
     cd "${_srcname}"
