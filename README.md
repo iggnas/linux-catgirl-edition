@@ -50,7 +50,7 @@ note that not all optimizations are enabled by default.
 - Clang;
 - No prink() support. This reduces size (no more strings) and reduces overhead where printk() calls are plenty (eg during boot, resume);
 - Scheduler debugging removed;
-- Trim unused headers to help LTO and optimization if headers are disabled.
+- Trim unused headers to help LTO and optimization if headers are disabled
 
 ... aaaand much more (probably).
 
@@ -65,8 +65,12 @@ note that not all optimizations are enabled by default.
 You can download the precompiled package either from the [releases page](https://github.com/pparaxan/linux-catgirl-edition/releases) or build from the [actions page](https://github.com/pparaxan/linux-catgirl-edition/actions).
 
 ## How do I compile linux-catgirl-edition locally?
+
 * Make a folder named "linux-catgirl-edition" and place the [PKGBUILD](https://github.com/pparaxan/linux-catgirl-edition/blob/main/PKGBUILD) inside it.
+* This is important, open the `PKGBUILD` file and enable or disable any optimizations you may or may not want[^2].
 * Run the command `makepkg -scf --cleanbuild --skipchecksums` to install the package.
+
+[^2]: don't worry, its very documented. and to clarify the important part: many optimizations displayed in the optimizations section are disabled by default because I know some of you will blindly `makepkg -s` anyway.
 
 That's it, Enjoy the Catgirl Edition of Linux!
 
