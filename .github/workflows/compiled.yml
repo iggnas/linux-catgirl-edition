@@ -41,9 +41,9 @@ jobs:
             makepkg -scf --cleanbuild --skipchecksums
           EOF
 
-      - name: .zip linux-catgirl-edition directory
+      - name: .zip the linux-catgirl-edition directory
         run: |
-          zip -r linux-catgirl-edition.zip . -x "*.git*" "*.github*" "README.md"
+          zip -r linux-catgirl-edition.zip . -x ".git/*" ".github/*" "README.md" "linux-[0-9]*.tar.xz"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
