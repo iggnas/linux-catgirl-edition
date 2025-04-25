@@ -11,40 +11,52 @@ it does not affect the end user.
 
 want an example? linux-zen has module unloading support. when was the last time you ran `modprobe -r --remove-holders i915`? probably never.
 
-## Principles
+<details>
+<summary>Optimizations</summary>
 
-### You are a gamer.
+note that not all optimizations are enabled by default.
 
-catgirl edition offers the option to disable debugging features because lets be real, you are never going to run gdb to read `/dev/kcore`, run `perf`, or `samply`, right after a gaming session.
+## perf:
 
-bet you never knew those were a thing.
+- Guess unwinder. It has zero runtime overhead as opposed to ORC and frame pointer unwinders;
+- 1000Hz (techinically reduces perf [throughput] in favor of responsiveness);
+- Tickless idle, because full tickless is bad[^1];
+- Removed paravirtualized layer in favor of performance. However, this is negative if you try to run the kernel under a VM;
+- TCP BBR3;
+- No memory zero-init (!). If you don't trust your userspace apps, THEN DONT RUN THEM;
+- No structure corruption checking (!);
+- x86-64-v3 optimized (kernel does not do x86-64-v4);
+- Performance governor by default;
+- CachyOS kernel patches;
+- `-O3` optimization (!);
+- Uses lazy preemption by default as opposed to full preemption to balance throughput & latency (full prioritises latency, and you lose a bit of throughput);
+- No module unloading. The docs say that it makes the kernel simpler and run faster;
+- modify_ldt removed for lower context switch latency
 
-### You are a server.
+## size:
 
-catgirl edition offers the option to disable debugging features because lets be real, you are never going to run gdb to read `/dev/kcore`, run `perf`, or `samply`, in production.
+- BUG() support removed;
+- Removed radio drivers;
+- Coredump support removed;
+- Tracing infrastructure removed;
+- Removed support for processors that are not Intel or AMD;
+- NUMA removed, probably. I have no idea if linux enabled it again during compile and frankly im not fighting the makefile lmao;
+- No module decompression in kernel. This also reduces the attack surface, but if you don't trust your userspace apps, THEN DONT RUN THEM;
+- 32 bit and 16 bit support _can_ be removed
 
-bet you never knew those were a thing.
+## size & perf:
 
-### You don't run VMs.
+- Clang ThinLTO;
+- Clang;
+- No prink() support. This reduces size (no more strings) and reduces overhead where printk() calls are plenty (eg during boot, resume);
+- Scheduler debugging removed;
+- Trim unused headers to help LTO and optimization if headers are disabled.
 
-catgirl edition makes the assumption that:
+... aaaand much more (probably).
 
-1. the kernel will not run in a vm
-1. the kernel will not run any vms
+[^1]: source: i made it up.
 
-this allows us to disable things like XEN drivers, a paravirtualization layer, remove certain virtualization drivers.
-
-### You are not [somebody that's under investigation by law enforcement].
-
-catgirl edition offers the option to disable various security features for performance. Some ranging from runtime checks like
-KASAN* or actual security features like SELINUX.
-
-> [!WARNING]
-> it being an option does not imply that you should. explore your threat model carefully.
-
-## Why only cachyos patchset?
-
-too lazy to make sure clearlinux and xanmod patches all work, so cachyos patchset until i have more time on my hands.
+</details>
 
 ---
 
@@ -57,3 +69,4 @@ You can download the precompiled package either from the [releases page](https:/
 * Run the command `makepkg -scf --cleanbuild --skipchecksums` to install the package.
 
 That's it, Enjoy the Catgirl Edition of Linux!
+
