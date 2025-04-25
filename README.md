@@ -66,7 +66,7 @@ You can download the precompiled package either from the [releases page](https:/
 
 ## How do I compile linux-catgirl-edition locally?
 
-* Make a folder named "linux-catgirl-edition" and place the [PKGBUILD](https://github.com/pparaxan/linux-catgirl-edition/blob/main/PKGBUILD) inside it.
+* Clone this repository, and **c**hange **d**directory into it.
 * This is important, open the `PKGBUILD` file and enable or disable any optimizations you may or may not want[^2].
 * Run the command `makepkg -scf --cleanbuild --skipchecksums` to install the package.
 
