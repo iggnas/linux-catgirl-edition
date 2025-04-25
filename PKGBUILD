@@ -533,6 +533,9 @@ makedepends=(
   tar
   xz
   zstd
+  clang
+  llvm
+  lld
 )
 
 _patchsource="https://raw.githubusercontent.com/cachyos/kernel-patches/master/${_major}"
@@ -777,7 +780,7 @@ prepare() {
         scripts/config -d MODULE_UNLOAD
     fi
 
-    if [ "$_disable_kernel_module_decompress" = "yes" ]; then 
+    if [ "$_disable_kernel_module_decompress" = "yes" ]; then
         echo "Disable kernel module decompression"
         scripts/config -d MODULE_DECOMPRESS
     fi
@@ -1210,4 +1213,3 @@ b2sums=('11835719804b406fe281ea1c276a84dc0cbaa808552ddcca9233d3eaeb1c001d0455c72
         '83460f7c8da099f97cbee7dd7c724eec7be1b8e72640209a6a00c860d0c780b6672a8fa574270c0048f7f2da886ce4b8aacd2a433d871fcdbbaac07a48857312'
         'c7294a689f70b2a44b0c4e9f00c61dbd59dd7063ecbe18655c4e7f12e21ed7c5bb4f5169f5aa8623b1c59de7b2667facb024913ecb9f4c650dabce4e8a7e5452'
         'b8b3feb90888363c4eab359db05e120572d3ac25c18eb27fef5714d609c7cb895243d45585a150438fec0a2d595931b10966322cd956818dbd3a9b3ef412d1e8')
-
