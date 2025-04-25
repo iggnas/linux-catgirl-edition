@@ -148,7 +148,7 @@ _minor=3
 #
 # if latency IS AN ABSOLUTE REQUIREMENT (and throughput is not), run 1000Hz and use the realtime patchset. (set _cpusched to rt, or rt-bore)
 # and set _tickrate (below) to full
-: "${_HZ_ticks:=300}"
+: "${_HZ_ticks:=1000}"
 
 # kernel tickrate
 # full tickless is where timer ticks stop even when a CPU is active whenever possible. it is aimed at high performance
