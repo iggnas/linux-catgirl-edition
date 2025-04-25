@@ -330,7 +330,7 @@ _minor=4
 # kernel size.
 #
 # do not enable if you use steam, or have 32-bit apps left (i.e. lib32/multilib repo enabled?)
-: "${_no_32bit:=yes}"
+: "${_no_32bit:=no}"
 
 # no LDT syscall
 #
