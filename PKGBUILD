@@ -68,6 +68,10 @@ _minor=4
 
 # use `performance` governor by default?
 #
+# DEPRECATED: since linux-5.8.y, the `cpufreq.default_governor` cmdline parameter has been introduced. if you wish to set performance as default governor,
+#             add `cpufreq.default_governor=performance` to your kernel cmdline.
+#             this option will be REMOVED when linux-6.15 comes along.
+#
 # generally, you should let something like gamemode to set the performance governor at runtime, so leave at 'no',
 #            unless you don't care about heat and electricity bills.
 #            leave disabled on laptops; thermal throttling will impact performance and battery life will suffer.
