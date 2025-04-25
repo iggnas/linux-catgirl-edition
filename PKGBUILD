@@ -15,7 +15,7 @@
 #
 # however, you should consider looking for a more updated pkgbuild incase some .config options change.
 _major=6.14
-_minor=3
+_minor=4
 
 # include cachyos patchset?
 #
