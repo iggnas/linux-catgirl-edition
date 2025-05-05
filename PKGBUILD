@@ -277,7 +277,7 @@ _minor=5
 # this can reduce the kernel size, but probably wont make the kernel use less ram.
 #
 # if you do not compress your initramfs, you can set to yes. it reduces the size of the vmlinuz binary
-: "${_no_compressed_initramfs:=yes}"
+: "${_no_compressed_initramfs:=no}"
 
 # disable VM support
 #
