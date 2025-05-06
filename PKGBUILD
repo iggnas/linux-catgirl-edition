@@ -4,16 +4,18 @@
 
 # set the following variables to anything but null
 #
-# the comments above offer documentation.
-# comments that begin with `generally` are my recommendation.
-#
+# the comments above the options offer documentation. read throughly, and do research if needed
+# if unsure, ask the maintainers:
+# nyameowmeow at duck dot com
+# xxdr at duck dot com
+
 # make sure to read all of the possible configuration options. there may be some things you want enabled or disabled.
 # don't blindly `makepkg -scf --cleanbuild --skipchecksums` the kernel (though you could, just, its not the best)
 
 # kernel version
-# generally, you should only change this if you need a specific kernel
+# only change this if you need a specific kernel. make sure to run `rm *.patch` prior to ensure you have the right patches
 #
-# however, you should consider looking for a more updated pkgbuild incase some .config options change.
+# consider `git fetch && git pull` if you're updating the kernel instead
 _major=6.14
 _minor=5
 
@@ -23,37 +25,53 @@ _minor=5
 : "${_import_cachyos_patchset:=yes}"
 
 # select a CPU scheduler
-# generally, this will only have a significant performance impact performance under load, as this affects which processes
+#
+# possible options & explaination:
+# `bore`     is a modified EEVDF scheduler that is less fair with its scheduling in order to provide
+#            better interactivity under load. recommended for desktop systems
+# `bmq`      is a scheduler inspired by Google's Zircon. It is designed to be small. may benefit slow machines
+#            by being more likely to fully fit in L1i cache. possibly less mature than EEVDF (or CFS) and as such
+#            may not schedule as well under load (or in general?)
+# `hardened` is just `bore` with some patches from linux-hardened. not supported by catgirl-edition
+# `eevdf`    is the stock linux scheduler. it promises all tasks will get the CPU in an acceptable amount of time
+#            provided that the CPU is not at 100% load. it is fully fair and is therefore the scheduler of choice
+#            for server systems.
+# `rt`       is a set of patches that run the `eevdf` scheduler to provide realtime latency (latency such as
+#            the time between a car crash and airbags deploying). good for latency sensitive systems and systems
+#            where latency need to be predictable
+# `rt-bore`  is `rt` but runs the `bore` scheduler. more suited for desktop systems that for some reason need realtime
+#            or predictable latency (like professional audio workstations.)
+#
+# note that it seems like realtime kernels probably wont help you lots if you play rhythm games
+#
+# this will only have a significant performance impact performance under load, as this affects which processes
 # get the CPU.
 #
-# 'bore' - select 'Burst-Oriented Response Enhancer'
-# 'bmq' - select 'BMQ Scheduler'
-# 'hardened' - select 'BORE Scheduler hardened' (linux-hardened with bore)
-# 'eevdf' - select 'EEVDF Scheduler'
-# 'rt' - select EEVDF, but includes a series of realtime patches
-# 'rt-bore' - select Burst-Oriented Response Enhancer, but includes a series of realtime patches
-#
-# generally, `bore` is a good choice. if you are building for a latency critical system, `rt` or `rt-bore` may work better
-#            if you are building for a server, set `eevdf` (the mainline linux kernel scheduler)
-#            latency critical servers should use `rt` instead of `rt-bore`.
+# `bore` is a good choice. if you are building for a latency critical system (realtime), `rt` or `rt-bore` may
+# work better if you are building for a server, set `eevdf` (the mainline linux kernel scheduler)
+# latency critical servers should use `rt` instead of `rt-bore`.
 #
 # if unsure, select `bore`
 : "${_cpusched:=bore}"
 
 # configure the kernel via nconfig?
-: "${_makenconfig:=yes}"
+: "${_makenconfig:=no}"
 
 # use modprobed-db to reduce kernel size
 # disable this option if you are building a generic kernel for everyone
 #
-# generally, you will want to leave this at `yes` to reduce compile time.
-#            if you plan on using the same kernel on multiple different computers, you would want to include those
-#            modules in your modprobed_db or disable this.
+# you will want to leave this at `yes` to reduce compile time.
+# if you plan on using the same kernel on multiple different computers, you would want to include those
+# modules in your modprobed_db or disable this.
+#
+# if unsure, select `yes` AND read this article: https://wiki.archlinux.org/title/Modprobed-db
 : "${_localmodcfg:=yes}"
 
 # where is your modprobed_db?
 #
-# generally, you should leave this to the default as this is where modprobed.db is located by default.
+# if _localmodcfg is enabled, this value must be set or compile will fail early on.
+#
+# if unsure, leave as default.
 : "${_localmodcfg_path:="$HOME/.config/modprobed.db"}"
 
 # use -O3 to compile kernel?
@@ -62,8 +80,9 @@ _minor=5
 # this may hurt performance if the compiler makes mistakes.
 # this can make undefined behaviour in the kernel worse, as -O3 assumes UB is impossible (even more than -O2), however, i trust the kernel maintainers.
 #
-# generally, i think -O3 is a safe bet, however, if you wish to err on the side of caution, you may disable it.
-#            there's a reason linux mainline only allows -O3 on the ARC architecture anyhow.
+# -O3 may be a safe bet, but if you want to err on the side of caution, say no
+#
+# if unsure, select yes
 : "${_cflags_O3:=yes}"
 
 # use `performance` governor by default?
@@ -78,96 +97,69 @@ _minor=5
 : "${_perf_governor_default:=no}"
 
 # enable Google's TCP BBR3
+#
 # https://www.phoronix.com/news/Google-BBRv3-Linux
 # note: this is not an offical Google product.
+# it increases throughput and reduces latency of network connections. confirmed to work in production at Google.
 #
-# generally, you'll want to leave this on enabled, unless you know for a fact that your workloads don't work well with
-#            BBRv3
+# if unsure, select yes
 : "${_tcp_bbr3:=yes}"
 
 # kernel tickrate
+#
 # valid options: 1000, 750, 600, 500, 300, 250 and 100.
-# To decide a good choice, see the kernel/Kconfig.hz file (after cachyos patches)
 #
 # WARNING: if `_import_cachyos_patches` is not enabled, only 1000, 300, 250 and 100 values are available.
-#
-# 	config HZ_100
-#		bool "100 HZ"
-#	help
-#	  100 Hz is a typical choice for servers, SMP and NUMA systems
-#	  with lots of processors that may show reduced performance if
-#	  too many timer interrupts are occurring.
-#
-#	config HZ_250
-#		bool "250 HZ"
-#	help
-#	 250 Hz is a good compromise choice allowing server performance
-#	 while also showing good interactive responsiveness even
-#	 on SMP and NUMA systems. If you are going to be using NTSC video
-#	 or multimedia, selected 300Hz instead.
-#
-#	config HZ_300
-#		bool "300 HZ"
-#	help
-#	 300 Hz is a good compromise choice allowing server performance
-#	 while also showing good interactive responsiveness even
-#	 on SMP and NUMA systems and exactly dividing by both PAL and
-#	 NTSC frame rates for video and multimedia work.
-#
-# 	config HZ_500
-#		bool "500 HZ"
-#	help
-#	 500 Hz is a balanced timer frequency. Provides fast interactivity
-#	 on desktops with good smoothness without increasing CPU power
-#	 consumption and sacrificing the battery life on laptops.
-#
-#	config HZ_600
-#		bool "600 HZ"
-#	help
-#	 600 Hz is a balanced timer frequency. Provides fast interactivity
-#	 on desktops with good smoothness without increasing CPU power
-#	 consumption and sacrificing the battery life on laptops.
-#
-#	config HZ_750
-#		bool "750 HZ"
-#	help
-#	 750 Hz is a balanced timer frequency. Provides fast interactivity
-#	 on desktops with good smoothness without increasing CPU power
-#	 consumption and sacrificing the battery life on laptops.
-#
-#	config HZ_1000
-#		bool "1000 HZ"
-#	help
-#	 1000 Hz is the preferred choice for desktop systems and other
-#	 systems requiring fast interactive responses to events.
+# IMPORTANT: if using the realtime patchset (i.e. _cpusched:=rt or rt-bore), you may want to select 1000Hz
 #
 # typically, 1000Hz is a good choice for most desktop users. If you're a programmer, you may like 750Hz more as it
 # is balanced between throughput and responsiveness.
 #
 # server systems would pick between 100-300Hz, depending on the hardware and expected workloads.
 #
-# **100Hz** is good for server workloads that need power efficiency and where latency doesn't matter
-# **250Hz** is a balance between 100 and 300, if you need both power efficiency and latency.
-# **300Hz** is good for low latency realtime workloads, like game servers.
+# **100Hz**  provides excellent throughput and power energy efficiency (i.e. file server)[^1]
+# **250Hz**  provides a balance between 100 and 300, if you need both power efficiency and latency.
+# **300Hz**  provides good throughput for workloads that are latency sensitive (i.e. game servers)
+# --- 500 and 600 are in the middle of throughput and interactiveness. you can probably fill in the blanks
+# **750Hz**  provides good interactiveness but also has good throughput (i.e. compiling while using social media)
+# **1000Hz** provides excellent interactiveness (latency) (i.e. multitasking several browser tabs)
 #
-# if latency IS AN ABSOLUTE REQUIREMENT (and throughput is not), run 1000Hz and use the realtime patchset. (set _cpusched to rt, or rt-bore)
-# and set _tickrate (below) to full
+# [^1]: this may hurt performance on systems with many cores where many timer interrupts are occuring
+#
+# if unsure, select 1000
 : "${_HZ_ticks:=1000}"
 
 # kernel tickrate
+#
 # full tickless is where timer ticks stop even when a CPU is active whenever possible. it is aimed at high performance
-#               low latency systems. may require special configuration to fully take advantage of.
+#               low latency systems. may require special configuration to fully take advantage of. otherwise, behaves
+#               exactly the same as idle
 # idle tickless stops timer ticks when all CPUs are idle. better energy efficiency
 # periodic is suitable for real-time systems, but is not power efficient at all.
 #
-# most users will typically want idle.
+# if unsure, select idle
 : "${_tickrate:=idle}"
 
 # kernel preemption mode
-# i have few comments on this matter; go do your research until i bother (lmao)
+#
+# how should the kernel preempt?
+# `full` preemption provides best responsiveness to apps by allowing all kernel code to be preempted[^1]
+# `lazy` preemption provides good responsiveness by being less eager to preempt SCHED_NORMAL tasks
+# `voluntary` preemption only preempts tasks at specific points. slightly worse latency than lazy, but better
+#        throughput than lazy
+# `none` (or also known as 'server') preemption provides best throughput by only allowing sysret and interrupts as
+#        the only source of interrupts. not particually great for desktop systems
+#
+# NOTE: this option is ignored if `_cpusched` is set to `rt` or `rt-bore`. in that case, all kernel code
+#       will be preemptable except for a few critical sections.
+#
+# if unsure, select `lazy`
+#
+# [^1]: except critical sections
 : "${_preempt:=lazy}"
 
 # manages memory allocation using larger pages (usually 2 MB) instead of 4 KB pages for performance.
+#
 # `always`:  always attempts hugepages for allocations. this may cause applications to use more memory than needed, if
 #            the application is poorly designed and only uses a small portion of the `mmap`ed memory.
 #            (applications may opt-out through special syscalls, but most apps probably don't)
@@ -178,17 +170,22 @@ _minor=5
 # echo always > /sys/kernel/mm/transparent_hugepage/enabled
 # or just set here and https://tryitands.ee
 #
-# generally, you want to set this to `always` unless your machine is low on memory (eg <1GB)
+# you may perfer `madvise` if your system is low on memory (<1 GB)
+#
+# if unsure, select `always`
 : "${_hugepage:=always}"
 
 # optimize kernel for a specific processor
-# view available options here: https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html
 #
-# this can be left empty, but will prompt when building, unless _use_auto_optimization is set to `yes`
+# this can be left empty, but will prompt when building, unless `_use_auto_optimization` is set to `yes`
 #
-# if you distribute your kernel, set _use_auto_optimization (below) to no and set this to GENERIC_V3 (for x86-64-v3), GENERIC_V2 (for x86-64-v2) or GENERIC (x86-64-v1)
+# if you distribute your kernel, set `_use_auto_optimization` (below) to no and set this to GENERIC_V3 (for x86-64-v3), GENERIC_V2 (for x86-64-v2) or GENERIC (x86-64-v1)
 #
-# if you want to optimize for your current cpu, set native_amd or native_intel depending on your CPU, or if you know your exact arch (eg, in my case, my Ryzen 7 8745HS is zen4)
+# if you want to optimize for your current cpu, set native_amd or native_intel depending on your CPU, or if you know your exact arch (in my case, my Ryzen 7 8745HS is ZEN4, my i7-10510U is SKYLAKE, my A4-6210 is JAGUAR[^1])
+#
+# if unsure, select `GENERIC`
+#
+# [^1]: the A4-6210 is actually btver2, but the patches demand jaguar for some reason. read the `auto-cpu-optimization.sh` script for all options
 : "${_processor_opt:=}"
 
 # autodetects current CPU and optimizes for it
@@ -196,12 +193,14 @@ _minor=5
 #
 # this is essentally -march=native
 #
-# generally, you'll probably never distribute your kernel, so leave on `yes`
-#            however, if you are, set to no
+# if you distribute your kernel, make sure to set this to n, and set `_processor_opt` to a correct value (see its documentation)
 : "${_use_auto_optimization:=yes}"
 
 # clang LTO mode
-# "none", "full", "thin"
+#
+# possible options: "none", "full", "thin"
+# setting this to an option other than `none` will use clang to build the kernel. if you demand stability
+# (the kernel is only offically tested with gcc), select "none"
 #
 # CAUTION: if compiling on a 32-bit system without PAE, selecting an LTO may surpass the 4 GB usable memory barrier.
 #          full LTO takes substantally longer than thin LTO.
@@ -209,9 +208,12 @@ _minor=5
 #          i've seen full LTO use about 13 GB of ram, for a localmodcfg build. it may be **significantly** higher if it is allmodcfg
 #          if your system or build cluster does not have this much physical memory, do not enable this
 #
+# IMPORTANT: LTO in the kernel is experimental. while i have seen no issues with it, you might. if that is the case, consider disabling
+#            this optimization
+#
 # LTO does not hurt performance or memory usage at runtime. it is an optimization that takes a long time to perform when compiling.
 #
-# generally, setting this to `thin` would work for most people.
+# if unsure, select thin
 : "${_use_llvm_lto:=thin}"
 
 # https://wiki.archlinux.org/title/NVIDIA
@@ -223,15 +225,20 @@ _minor=5
 : "${_build_nvidia_open:=no}"
 
 # whether to package headers for this kernel
+#
 # this will package the linux-catgirl-edition-headers package which will allow users to build their own kernel modules
 # for some users, there is no need for headers, since you can build it into the kernel right now.
 # setting to `no` is more secure in the event that something obtains root, as any malicious actors cannot simply compile their own kernel
 # object, and the kernel will reject kernel objects that are incompatable with the kernel
 #
+# Q: do i need headers?
+# A: check if you have any `-dkms` packages. on pacman distros, the command is `pacman -Q | grep dkms`
+#    if so, you probably need headers.
+#
 # as for performance and size advantages, enabling this alongside `_disable_debugging` will enable the TRIM_UNUSED_KSYMS
 # option which allows the compiler (even better with LTO) to optimize more
 #
-# generally, you want to leave this enabled. this can be safely disabled if you dont use any OOT modules
+# if unsure, say yes
 : "${_package_headers:=yes}"
 
 # automatically answer the default answer in make prepare?
@@ -239,9 +246,13 @@ _minor=5
 # needed in CI (if you cant interact with it), or if there is an overwhelmingly large amount of options.
 # may change kernel in ways you may not expect (but catgirl edition tweaks are applied AFTER make prepare)
 #
-# WARNING: this may negate localmodconfig's changes. further testing is needed
+# if you decide to say no, you will be presented with a bunch of options that you have to say `y`, `m`, and `n` to.
+# normally, you can just hold down enter (which is what this option does), but may disable some configuration options
+# that you may want.
 #
-# generally, should be safe to enable, and DO enable in a CI
+# DO enable in a CI.
+#
+# if unsure, say yes
 : "${_unattended_make_prepare:=no}"
 
 # disable module unloading
@@ -250,42 +261,52 @@ _minor=5
 # as the name implies, you will not be able to unload modules (so you wont be able to
 # modprobe -r i915)
 #
-# generally, its safe to say `yes` here, unless you have to unload modules
+# if unsure, say yes
 : "${_disable_module_unloading:=yes}"
 
 # disable module decompression in kernel space
 #
 # this option implies extra code in the kernel, which is probably a problem due to
-# extra code in the kernel (higher attack surface, and memory usage)
+# extra code in the kernel (higher attack surface and memory usage)
 #
-# generally, i think its safe to say `yes` here
+# if unsure, say yes
 : "${_disable_kernel_module_decompress:=yes}"
 
 # disable zswap
 #
-# use zram instead :trolla:
-# never use a disk swapfile, if you like performance and want the drive to last longer
+# use zram instead.
+# never use a disk swapfile if you like performance and want the drive to last longer.
+#
+# if your system is very low on ram, fine. go use zswap.
+#
+# if unsure, say yes
 : "${_disable_zswap:=yes}"
 
 # disable hibernation
 #
-# reduces kernel size probably, idk lma
 # as with my advice with a swapfile, you probably don't want this. disable to reduce kernel size
+#
+# if unsure, say yes
 : "${_disable_hibernation:=yes}"
 
 # disable compressed initramfs
-# this can reduce the kernel size, but probably wont make the kernel use less ram.
 #
+# this can reduce the kernel size, but probably make the kernel use less ram.
 # if you do not compress your initramfs, you can set to yes. it reduces the size of the vmlinuz binary
+# so more kernels or configuration data may fit in /boot
+# on arch linux, the initramfs is compressed by default.
+#
+# if unsure, say no
 : "${_no_compressed_initramfs:=no}"
 
 # disable VM support
 #
 # makes the kernel optimized for bare metal by no longer providing virtual machine support
-# do not enable if you plan on running the kernel in a vm, or running vms on the kernel.
-# (not sure about vbox or vmware, but KVM _will_ be affected due to its use of KVM)
+# in particular, this disables KVM support, kernel guest support, xen drivers, et al.
 #
-# generally, most people would have this set to `yes`
+# docker **desktop** (not regular docker) uses KVM, so you may not want to disable this if you use docker desktop
+#
+# if unsure, say yes
 : "${_no_vm:=yes}"
 
 # no foreign partitioning schemes
@@ -293,39 +314,45 @@ _minor=5
 # dont support weird partition schemes
 # this may break some systems if you use those but chances are, if you installed linux normally with something like
 # cfdisk or fdisk or something like that as your partioning, it should be fine
+#
+# if unsure, say no
 : "${_advanced_partition:=no}"
 
 # use smaller data structures for kernel core
 #
 # this can reduce kernel memory usage, but can hurt performance as the data structures
-# are optimized for size rather than performance
+# are optimized for size rather than performance.
+# only enable on a memory constrained system (such as an embedded one)
 #
-# generally, you will want to say `no` here unless you are building for an embedded machine, or your
-#            system is VERY low on memory
+# if unsure, say no
 : "${_smaller_page:=no}"
 
-# this will disable kexec
+# disable kexec
 #
 # this can in theory improve security by making it so the kernel can't execute another kernel
-# however, in practice, i dont think any malicious programs use this
+# however, in practice, i dont think any malicious programs use this. otherwise, this reduces
+# memory usage (less code)
 #
-# if your BIOS is slow to initialize, you may want to look into kexec, to improve rebooting performance.
+# tools like kdump use this
 #
-# generally, desktop users will want to say yes.
+# if your BIOS is slow to initialize, you may want to look into kexec to improve rebooting performance
+#
+# if unsure, say yes
 : "${_disable_kexec:=yes}"
 
 # disable memory hotplug
 #
 # i have never seen a desktop user use this.
 #
-# generally, you may want to say `yes` here to have less code. if you use memory hotplug, you probably
-#            would want to set this to `no`
+# if unsure, say yes
 : "${_no_memory_hotplug:=yes}"
 
 # disable 16-bit legacy code
 #
 # disables running 16 bit code on the kernel. this saves 300 bytes on i386 and 16k runtime memory on x86-64
-# generally, i think it is safe to say `yes` here, unless you plan to run very old programs under wine
+# some very old wine programs rely on this
+#
+# if unsure, say yes
 : "${_no_16bit:=yes}"
 
 # disable 32-bit binaries
@@ -334,13 +361,15 @@ _minor=5
 # kernel size.
 #
 # do not enable if you use steam, or have 32-bit apps left (i.e. lib32/multilib repo enabled?)
+#
+# if unsure, say no
 : "${_no_32bit:=no}"
 
 # no LDT syscall
 #
 # disable per-process Local Descriptor Table using modify_ldt(2) syscall.
 # it reduces context switch overhead and reduces kernel attack surface, but
-# some very low level threading libaries, DOSEMU and some wine programs use it.
+# some low level threading libaries, DOSEMU and certain wine programs use it.
 #
 # the kernel documentation states saying `yes` here makes sense for embedded or server kernels.
 : "${_disable_ldt_syscall:=yes}"
@@ -353,20 +382,26 @@ _minor=5
 # disables coredump support
 #
 # do not enable if you plan on debugging SIGSEGVs or other faults that generate a coredump
-# may break systemd-coredumpd. not sure, never tested, and its systemd so i don't care.
+# you will need this if you want to investigate segfaults
 #
-# generally, most people can set this to yes. if you work on code that may segfault (i.e. c, asm, unsafe rust, zig) you should set to no
-#            if you test software, you'll also want this as to help developers reproduce bugs.
+# if you do not know what a 'segfault' is, you probably can disable this to reduce memory usage.
+#
+# might break systemd-coredumpd[^1]
+#
+# if unsure, say yes
+#
+# [^1]: systemd has a history of killing itself over the smallest disabled kernel feature
 : "${_no_core_dump:=yes}"
 
 # disables dmesg functionality
 #
-# this can make the kernel smaller and slightly faster and use less ram, as there is no need to hold
+# this can make the kernel smaller, slightly faster and use less ram; there would be no need to hold
 # dmesg logs
 #
-# generally, you will want to say `no` UNLESS you don't plan on debugging the kernel ever
-#            i.e. the mainline kernel has no issues for you. this will make kernel panics
-#            and other errors basically impossible to diagnose
+# say no here if you want to debug the kernel (i.e. developing kernel modules) or otherwise need to use dmesg
+# saying yes will make the kernel harder to debug if issues arise.
+#
+# if unsure, say `no`
 : "${_disable_dmesg:=no}"
 
 # disables BUG() support
@@ -374,7 +409,11 @@ _minor=5
 # setting this to `yes` will remove support for BUG() and WARN(), which can make your kernel smaller, but
 # ignoring fatal conditions (e.g. null pointer deref)
 #
-# generally, if _disable_dmesg (see above) is enabled, you should enable this too.
+# you may want to enable `panic_on_warn` if you disable dmesg, as there would be no way to see what is wrong.
+# otherwise, if you dont care about bugs or you believe you never experience them, you might be able to get
+# away with enabling this
+#
+# if unsure, set to the same option as `_disable_dmesg`
 : "${_disable_bug:=no}"
 
 # removes various debugging stuff
@@ -394,23 +433,26 @@ _minor=5
 # disable scheduler debugging
 # shrinker subsystem debugging
 #
-# generally, it is safe to disable debugging for essentally free performance. if you plan on debugging software
-#            or the kernel itself, leave this enabled
+# it is safe to disable debugging for essentally free performance. if you plan on debugging software
+# or the kernel itself, leave this enabled
+#
+# if unsure, say yes
 : "${_disable_debugging:=yes}"
 
 # disable BTF type generation
 #
 # WARNING: kernel compilation may FAIL if this and _package_headers is set to yes
 #
-# generally, you should leave this on no unless you don't use any BPF/BTF features (such as sched-ext)
+# you should leave this on no unless you don't use any BPF/BTF features (such as sched-ext)
+#
+# if unsure, say no
 : "${_no_btf:=no}"
 
 # disables profiling support used by some profilers.
 #
-# this may make things like samply and perf break. do not enable this if you plan on using these tools.
+# this may break things like `samply` and `perf`, if you are using these, set this to no.
 #
-# generally, you will want to say `no` unless you know for a fact that no applications will use the tracing
-#            APIs (such as samply)
+# if unsure, say yes
 : "${_disable_profiling:=no}"
 
 # check low memory corruption
@@ -418,20 +460,22 @@ _minor=5
 # disables the kernel check for the first 64k of memory every 60 seconds. the documentation
 # states it has no overhead, but im offering the choice to you anyway.
 #
-# generally, you can say `yes` here if your firmware isnt poorly poorly dsigned.
+# if unsure, say yes
 : "${_disable_low_corruption:=yes}"
 
 # disable lockup detection
 #
 # this will disable the detection of soft lockups (interrupt storms), hard lockups[^1], hung tasks (stuck in an uninterruptable 'D' state)
 #
-# even if detected, the processor, or system, will stay locked up. this is only a facility to report such issues.
+# even if detected, the processor or system will stay locked up. this is only a facility to report such issues.
 #
-# generally, its safe to say yes here, because its not like it'll recover from a lockup.
-#            for servers, it may be preferable to leave enabled and also additionally enable BOOTPARAM_HUNG_TASK_PANIC
-#            (kernel hacking -> debug oops... -> panic (reboot) on hung tasks, in nconfig)
+# its safe to say yes here, because its not like it'll recover from a lockup.
+# for servers, it may be preferable to leave enabled and also additionally enable BOOTPARAM_HUNG_TASK_PANIC
+# (kernel hacking -> debug oops... -> panic (reboot) on hung tasks, in nconfig)
 #
-#            (desktop users would be more likely to hard reset if the system freezes or becomes unresponsive, so this is just unnecessary overhead)
+# (desktop users would be more likely to hard reset if the system freezes or becomes unresponsive, so this is just unnecessary overhead)
+#
+# if unsure, say yes
 : "${_detect_lockups:=yes}"
 
 #
@@ -453,7 +497,7 @@ _minor=5
 # CAUTION: LSMs are standard linux kernel features, used in production kernels such as the Android kernel (thats almost a billion kernels).
 # Only disable if you can't afford the extra code in ring 0
 #
-# generally, you want to answer `no` here unless you are okay with a bit of fire.
+# if unsure, say no
 #
 # [^1]: to disable the warning, turn on the DisableSandbox option in pacman.conf
 : "${_no_lsms:=no}"
@@ -461,29 +505,50 @@ _minor=5
 # heap zeroing on allocation
 #
 # according to the documentation, disabling heap zeroing typically has <1% impact on workloads, but some synthetic (benchmark/stress)
-# workloads have measured 7%
-# take that information as you see fit.
+# workloads have measured 7%.
+#
+# this may open up your system to information exposure exploits from previously
+# used memory that has since been freed by other processes/threads. this means
+# that freed memory may be freely accessable to other processes that happen to
+# allocate those same regions of memory. these pieces of memory may include
+# cryptographic keys or other sensitive information you want to be zeroed out.
+#
+# this often requires a purposely malicious or buggy program[^2] to impact your security.
+#
+# if unsure:
+#     if you do not fully trust the apps running on your system[^1], say no
+#     if building for an embedded system or system with code you trust, its safe[r] to say yes
+#
+# [^1]: for example, any applications with proprietary code
+# [^2]: buggy as in exploitable from things like memory safety
 : "${_no_heap_zeroing:=no}"
 
 # disable stack zeroing
 #
-# this can improve performance in cases where lots of threads are spawned, HOWEVER, this may
-# open up your system to a whole class of uninitialized stack variable exploits and information exposures, or
-# simply make debugging harder (if your bug is trying to read a value on the stack that its frame has since
-# exited)
+# this can improve latency and performance in cases where lots of threads are spawned
 #
-# generally, say no here, unless you're building for a very performance/latency sensitive system or embedded system
-#            where these costs would be noticable
+# same security advisory (the huge wall of text) as `_no_heap_zeroing`
+#
+# this often requires a purposely malicious or buggy program[^1] to impact your security.
+#
+# if unsure, follow advice from `_no_heap_zeroing`
+#
+# [^1]: buggy as in exploitable from things like memory safety
 : "${_no_stack_zeroing:=no}"
 
-# check integrity linked list manipulation
+# disable checking of integrity linked list manipulation
 #
 # this enables checking for linked-list manipulation. disabling may improve performance very slightly.
+#
+# interestingly, the linux kernel has this disabled by default, but arch kernel enables this.
+#
+# if unsure, say yes
 : "${_no_checking_linkedlist_integrity:=no}"
 
 # disable stack corruption on schedule()
 #
 # disables corruption checking. documentation states the performance overhead is minimal, so take as you will.
+# if you have never encounted a kernel panic due to this, its probably safe to enable.
 : "${_no_schedule_stack_corruption:=no}"
 
 # disable stack protector
