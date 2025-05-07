@@ -55,7 +55,7 @@ _minor=5
 : "${_cpusched:=bore}"
 
 # configure the kernel via nconfig?
-: "${_makenconfig:=no}"
+: "${_makenconfig:=yes}"
 
 # use modprobed-db to reduce kernel size
 # disable this option if you are building a generic kernel for everyone
@@ -880,7 +880,8 @@ prepare() {
         # disable drivers as we wont be in a vm
         scripts/config -d VIRTIO_MENU \
             -d VHOST_MENU \
-            -d VIRT_DRIVERS
+            -d VIRT_DRIVERS \
+            -d VIRTIO_BLK
     fi
 
     if [ "$_no_16bit" = "yes" ]; then
