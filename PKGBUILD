@@ -264,6 +264,21 @@ _minor=5
 # if unsure, say yes
 : "${_disable_module_unloading:=yes}"
 
+# disable watchdog driver support
+#
+# this is a step further to the `nowatchdog` kernel parameter; this wont compile the watchdogs
+# at all, which can make the compile faster and kernel smaller (on disk).
+# it won't improve performance at all if `nowatchdog` is already a kernel parameter,
+# or if your system has no watchdog
+#
+# desktop users would be more likely to manually hard reset; server kernels should have this
+# enabled, especially if there is no intervention if the system hard freezes
+#
+# NOTE: this will not affect the systemd watchdog.
+#
+# if unsure, say yes
+: "${_disable_watchdog_driver:=yes}"
+
 # disable module decompression in kernel space
 #
 # this option implies extra code in the kernel, which is probably a problem due to
@@ -844,6 +859,11 @@ prepare() {
     if [ "$_disable_module_unloading" = "yes" ]; then
         echo "Disable module unloading"
         scripts/config -d MODULE_UNLOAD
+    fi
+
+    if [ "$_disable_watchdog_driver" = "yes" ]; then
+        echo "Disable watchdog"
+        scripts/config -d WATCHDOG
     fi
 
     if [ "$_disable_kernel_module_decompress" = "yes" ]; then
