@@ -609,8 +609,13 @@ _minor=5
 #
 # disables the detection of a stack overflow in the kernel. this is a security feature that will call panic() if overflowed.
 #
-# this reduces the kernel size, but also your security. if you've never seen a kernel panic occur because of this, its
-# probably safe to enable. still disabled by default for security.
+# the base CONFIG_STACKPROTECTOR value increases kernel code size by 3%, and the additional CONFIG_STACKPROTECTOR_STRONG
+# value increases the kernel code size by another 2%
+#
+# i have never seen a stack overflow in kernel land, so it seems to be rare
+# say yes only if you really need less ram usage
+#
+# if unsure, say no
 : "${_no_stack_protector:=no}"
 
 # disable kstack offset
