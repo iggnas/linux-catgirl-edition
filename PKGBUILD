@@ -279,6 +279,19 @@ _minor=5
 # if unsure, say yes
 : "${_disable_watchdog_driver:=yes}"
 
+# disable basic framebuffer driver
+#
+# this framebuffer is used in early boot prior to the initialization of DRM or KMS
+# might improve boot speed slightly, and reduce early userspace memory usage
+# if your DRM (e.x. amdgpu, nvidia, i915) drivers dont load, you might get booted
+# into a black screen
+# otherwise wont change the kernel much besides memory usage (less code)
+#
+# WARNING: EXPERIMENTAL! i have not tested this
+#
+# if unsure, say no; this is experimental
+: "${_disable_simpledrm:=no}"
+
 # disable module decompression in kernel space
 #
 # this option implies extra code in the kernel, which is probably a problem due to
@@ -864,6 +877,13 @@ prepare() {
     if [ "$_disable_watchdog_driver" = "yes" ]; then
         echo "Disable watchdog"
         scripts/config -d WATCHDOG
+    fi
+
+    if [ "$_disable_simpledrm" = "yes" ]; then
+        echo "Disable framebuffer & simpledrm"
+        scripts/config -d DRM_SIMPLEDRM
+        scripts/config -d FB_VESA
+        scripts/config -d FB_EFI
     fi
 
     if [ "$_disable_kernel_module_decompress" = "yes" ]; then
