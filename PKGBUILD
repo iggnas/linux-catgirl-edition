@@ -936,7 +936,8 @@ prepare() {
         scripts/config -d VIRTIO_MENU \
             -d VHOST_MENU \
             -d VIRT_DRIVERS \
-            -d VIRTIO_BLK
+            -d VIRTIO_BLK \
+            -d PVPANIC
     fi
 
     if [ "$_no_16bit" = "yes" ]; then
