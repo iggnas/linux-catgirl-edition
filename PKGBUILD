@@ -302,7 +302,7 @@ _minor=5
 # [^1]: kernel documentation says "The overhead for each GPU is very small." might not be worth it?
 #       adding the option because i have a low memory machine i want to squeeze every last byte out
 #       of it.
-: "${_maximum_gpus:=1}"
+: "${_maximum_gpus:=10}"
 
 # disable module decompression in kernel space
 #
