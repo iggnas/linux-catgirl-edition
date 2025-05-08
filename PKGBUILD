@@ -292,6 +292,18 @@ _minor=5
 # if unsure, say no; this is experimental
 : "${_disable_simpledrm:=no}"
 
+# maximum amount of GPUs supported
+#
+# reduces the number of GPUs the kernel will support. each gpu adds a (very small)[^1]
+# overhead. might be useful for very low memory systems
+#
+# if unsure, leave at 10
+#
+# [^1]: kernel documentation says "The overhead for each GPU is very small." might not be worth it?
+#       adding the option because i have a low memory machine i want to squeeze every last byte out
+#       of it.
+: "${_maximum_gpus:=1}"
+
 # disable module decompression in kernel space
 #
 # this option implies extra code in the kernel, which is probably a problem due to
@@ -885,6 +897,9 @@ prepare() {
         scripts/config -d FB_VESA
         scripts/config -d FB_EFI
     fi
+
+    echo "Set maximum # of GPUs"
+    scripts/config --set-val CONFIG_VGA_ARB_MAX_GPUS "${_maximum_gpus}"
 
     if [ "$_disable_kernel_module_decompress" = "yes" ]; then
         echo "Disable kernel module decompression"
