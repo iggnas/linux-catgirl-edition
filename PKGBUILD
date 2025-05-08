@@ -304,6 +304,20 @@ _minor=5
 #       of it.
 : "${_maximum_gpus:=10}"
 
+# disable FUSE support
+#
+# to my knowledge, the ntfs-3g driver needs this. i think flatpak
+# also relies on FUSE support.
+#
+# FUSE is quite a complex component and can be disabled provided no applications
+# use it, in order to save RAM and reduce the size of the kernel
+#
+# TODO: maybe offer the possibility to build FUSE as a module instead of disabling it fully, so it is
+#       only loaded when needed?
+#
+# if unsure, say no; some applications may be using it.
+: "${_disable_fuse:=no}"
+
 # disable module decompression in kernel space
 #
 # this option implies extra code in the kernel, which is probably a problem due to
@@ -900,6 +914,11 @@ prepare() {
 
     echo "Set maximum # of GPUs"
     scripts/config --set-val CONFIG_VGA_ARB_MAX_GPUS "${_maximum_gpus}"
+
+    if [ "$_disable_fuse" = "yes" ]; then
+        echo "Disable FUSE"
+        scripts/config -d FUSE_FS
+    fi
 
     if [ "$_disable_kernel_module_decompress" = "yes" ]; then
         echo "Disable kernel module decompression"
