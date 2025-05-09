@@ -1005,7 +1005,7 @@ prepare() {
 
     if [ "$_smaller_page" = "yes" ]; then
         echo "Enable smaller sized structures"
-        scripts/config -d BASE_SMALL
+        scripts/config -e BASE_SMALL
     fi
 
     if [ "$_disable_profiling" = "yes" ]; then
