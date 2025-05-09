@@ -530,7 +530,7 @@ _minor=5
 # (desktop users would be more likely to hard reset if the system freezes or becomes unresponsive, so this is just unnecessary overhead)
 #
 # if unsure, say yes
-: "${_detect_lockups:=yes}"
+: "${_disable_lockup_detection:=yes}"
 
 #
 # Unhardening
@@ -1013,7 +1013,7 @@ prepare() {
         scripts/config -d PROFILING
     fi
 
-    if [ "$_detect_lockups" = "yes" ]; then
+    if [ "$_disable_lockup_detection" = "yes" ]; then
         echo "Disable lockup detection"
         scripts/config -d DETECT_HUNG_TASK \
             -d HARDLOCKUP_DETECTOR \
