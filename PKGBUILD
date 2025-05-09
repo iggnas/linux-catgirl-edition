@@ -17,7 +17,7 @@
 #
 # consider `git fetch && git pull` if you're updating the kernel instead
 _major=6.14
-_minor=5
+_minor=6
 
 # include cachyos patchset?
 #
@@ -286,8 +286,6 @@ _minor=5
 # if your DRM (e.x. amdgpu, nvidia, i915) drivers dont load, you might get booted
 # into a black screen
 # otherwise wont change the kernel much besides memory usage (less code)
-#
-# WARNING: EXPERIMENTAL! i have not tested this
 #
 # if unsure, say no; this is experimental
 : "${_disable_simpledrm:=no}"
