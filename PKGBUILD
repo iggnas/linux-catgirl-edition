@@ -304,10 +304,11 @@ _minor=6
 
 # disable FUSE support
 #
-# to my knowledge, the ntfs-3g driver needs this. i think flatpak
-# also relies on FUSE support.
+# FUSE allows running a custom filesystem in userspace.
 #
-# FUSE is quite a complex component and can be disabled provided no applications
+# ntfs-3g and osu!lazer needs this.
+#
+# FUSE is quite a complex component and can be disabled provided that no applications
 # use it, in order to save RAM and reduce the size of the kernel
 #
 # TODO: maybe offer the possibility to build FUSE as a module instead of disabling it fully, so it is
