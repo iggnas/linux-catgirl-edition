@@ -485,6 +485,7 @@ _minor=7
 # if building headers disabled AND BTF type information disabled, will also disable DWARF v5 debuginfo
 # disable scheduler debugging
 # shrinker subsystem debugging
+# PnP debug messages
 #
 # it is safe to disable debugging for essentally free performance. if you plan on debugging software
 # or the kernel itself, leave this enabled
@@ -1061,7 +1062,8 @@ prepare() {
             -d PM_ADVANCED_DEBUG \
             -d ACPI_DEBUG \
             -d SHRINKER_DEBUG \
-            -d DEBUG_MEMORY_INIT
+            -d DEBUG_MEMORY_INIT \
+            -d PNP_DEBUG_MESSAGES
     fi
 
     if [ "$_package_headers" = "no" ]; then
