@@ -535,6 +535,7 @@ _minor=7
 #
 # Unhardening
 # Disable security features for performance
+# Note that many of these options require purposely malicious programs or programs with bugs to actually impact your security.
 #
 # Note: choosing the "have security" won't enable it, if you have manually overridden it in `config`. it only disables security options.
 #
@@ -623,6 +624,21 @@ _minor=7
 # might improve performance idk lmao.
 # makes memory corruption attacks that depend on stack address determinism or cross-syscall address exposures harder, if not flat out impossible
 : "${_no_randomize_kstack_offset:=no}"
+
+# disable IBT support
+#
+# disables Indirect Branch Tracking. having it enabled eliminates ENDBR instructions in the kernel, leading to very slightly better performance,
+# lower ram usage and kernel size.
+# typically the improvement is very marginal because CPUs are designed to deal with these.
+#
+# this is a security feature that prevents a malicious program from exploiting memory corruption bugs in the kernel
+# to change the control flow of the kernel by telling the CPU that all indirect calls must land on ENDBR. such bugs
+# require an existing memory corruption bug.
+#
+# saying yes here will make the build faster
+#
+# if unsure, say no
+: "${_no_ibt:=no}"
 
 # and thats basically it. after comes the logic
 # prepare some bleach if you plan to scroll
@@ -1122,6 +1138,11 @@ prepare() {
     if [ "$_no_randomize_kstack_offset" = "yes" ]; then
         echo "No kstack offset randomization"
         scripts/config -d RANDOMIZE_KSTACK_OFFSET
+    fi
+
+    if [ "$_no_ibt" = "yes" ]; then
+        echo "No IBT"
+        scripts/config -d X86_KERNEL_IBT
     fi
 
     # # Rewrite configuration
