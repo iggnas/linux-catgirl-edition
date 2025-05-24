@@ -972,6 +972,7 @@ prepare() {
             -d X86_INTEL_LPSS \
             -d X86_INTEL_PSTATE;;
         *) _die "The value $_supported_cpu_vendor is invalid. Pick the right option.";;
+    esac
 
     if [ "$_disable_module_unloading" = "yes" ]; then
         echo "Disable module unloading"
@@ -1058,7 +1059,7 @@ prepare() {
         scripts/config -d MODIFY_LDT_SYSCALL
     fi
 
-    if [ "$_disable_irq_time_accounting" = "yes" ]: then
+    if [ "$_disable_irq_time_accounting" = "yes" ]; then
         echo "Disable irq time accounting"
         scripts/config -d IRQ_TIME_ACCOUNTING
     fi
