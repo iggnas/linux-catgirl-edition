@@ -958,15 +958,15 @@ prepare() {
     scripts/config -e CONFIG_PROCESSOR_SELECT
     case "$_supported_cpu_vendor" in
         all) ;; # nothing, already enabled
-        common) config -d CPU_SUP_HYGON -d CPU_SUP_CENTAUR -d CPU_SUP_ZHAOXIN;;
-        intel) config -d CPU_SUP_HYGON -d CPU_SUP_CENTAUR -d CPU_SUP_ZHAOXIN \
+        common) scripts/config -d CPU_SUP_HYGON -d CPU_SUP_CENTAUR -d CPU_SUP_ZHAOXIN;;
+        intel) scripts/config -d CPU_SUP_HYGON -d CPU_SUP_CENTAUR -d CPU_SUP_ZHAOXIN \
             -d CPU_SUP_AMD \
             -d X86_MCE_AMD \
             -d AMD_NUMA \
             -d X86_AMD_PSTATE \
             -d X86_POWERNOW_K8 \
             -d X86_AMD_PLATFORM_DEVICE;;
-        amd) config -d CPU_SUP_HYGON -d CPU_SUP_CENTAUR -d CPU_SUP_ZHAOXIN \\
+        amd) scripts/config -d CPU_SUP_HYGON -d CPU_SUP_CENTAUR -d CPU_SUP_ZHAOXIN \
             -d CPU_SUP_INTEL \
             -d X86_MCE_INTEL \
             -d X86_INTEL_LPSS \
