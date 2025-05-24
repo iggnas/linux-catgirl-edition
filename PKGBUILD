@@ -1148,7 +1148,16 @@ prepare() {
             -d ACPI_DEBUG \
             -d SHRINKER_DEBUG \
             -d DEBUG_MEMORY_INIT \
-            -d PNP_DEBUG_MESSAGES
+            -d PNP_DEBUG_MESSAGES \
+            -d ATA_VERBOSE_ERROR \
+            -d MAC80211_DEBUGFS \
+            -d BT_DEBUGFS \
+            -d BLK_DEBUG_FS \
+            -d CFG80211_DEBUGFS \
+            -d DEBUG_BOOT_PARAMS \
+            -d DEBUG_RODATA_TEST
+
+        # TODO: does BLK_DEBUG_FS disable changing io scheduler at runtime?
     fi
 
     if [ "$_package_headers" = "no" ]; then
