@@ -1037,6 +1037,7 @@ prepare() {
     if [ "$_disable_dmesg" = "yes" ]; then
         echo "Disable dmesg"
         scripts/config -d PRINTK
+        scripts/config -d SYMBOLIC_ERRNAME
     fi
 
     if [ "$_disable_bug" = "yes" ]; then
