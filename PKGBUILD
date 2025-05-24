@@ -325,6 +325,16 @@ _minor=7
 # if unsure, say yes
 : "${_disable_kernel_module_decompress:=yes}"
 
+# disable kernel bootconfig support
+#
+# bootconfig is a feature that allows adding additional cmdline parameters
+# in a different way, it seems.
+#
+# verify that you're not using this: cat /proc/bootconfig
+#
+# if unsure, say yes
+: "${_disable_bootconfig:=yes}"
+
 # disable zswap
 #
 # use zram instead.
@@ -944,6 +954,11 @@ prepare() {
     if [ "$_disable_kernel_module_decompress" = "yes" ]; then
         echo "Disable kernel module decompression"
         scripts/config -d MODULE_DECOMPRESS
+    fi
+
+    if [ "$_disable_bootconfig" = "yes" ]; then
+        echo "Disable bootconfig support"
+        scripts/config -d CONFIG_BOOT_CONFIG
     fi
 
     if [ "$_disable_zswap" = "yes" ]; then
