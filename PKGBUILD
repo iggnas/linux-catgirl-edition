@@ -437,6 +437,14 @@ _minor=7
 # the kernel documentation states saying `yes` here makes sense for embedded or server kernels.
 : "${_disable_ldt_syscall:=yes}"
 
+# disable fine granularity task level IRQ time accounting
+#
+# skips reading a timestamp on each softirq and hardirq transition. saying yes
+# here can slightly improve performance, however, its probably too marginal to notice, maybe.
+#
+# if unsure, say yes
+: "${_disable_irq_time_accounting:=yes}"
+
 #
 # Bugging
 # Disable debugging features for size and performance
@@ -1009,6 +1017,11 @@ prepare() {
     if [ "$_disable_ldt_syscall" = "yes" ]; then
         echo "Disable LDT"
         scripts/config -d MODIFY_LDT_SYSCALL
+    fi
+
+    if [ "$_disable_irq_time_accounting" = "yes" ]: then
+        echo "Disable irq time accounting"
+        scripts/config -d IRQ_TIME_ACCOUNTING
     fi
 
     if [ "$_advanced_partition" = "no" ]; then
