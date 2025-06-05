@@ -719,7 +719,6 @@ _nv_open_pkg="NVIDIA-kernel-module-source-${_nv_ver}"
 source=(
     "https://cdn.kernel.org/pub/linux/kernel/v${pkgver%%.*}.x/${_srcname}.tar.xz"
     "config"
-    "auto-cpu-optimization.sh"
     "${_patchsource}/all/0001-cachyos-base-all.patch")
 
 # LLVM makedepends
@@ -784,24 +783,6 @@ prepare() {
 
     echo "Setting config..."
     cp ../config .config
-
-    if [ -n "$_processor_opt" ]; then
-        MARCH="${_processor_opt^^}"
-
-        if [ "$MARCH" != "GENERIC" ]; then
-            if [[ "$MARCH" =~ GENERIC_V[1-4] ]]; then
-                X86_64_LEVEL="${MARCH//GENERIC_V}"
-                scripts/config --set-val X86_64_VERSION "${X86_64_LEVEL}"
-            else
-                scripts/config -k -d GENERIC_CPU
-                scripts/config -k -e "M${MARCH}"
-            fi
-        fi
-    fi
-
-    if [ "$_use_auto_optimization" = "yes" ]; then
-        "${srcdir}"/auto-cpu-optimization.sh
-    fi
 
     # Selecting CachyOS config
     if [ "$_import_cachyos_patchset" = "yes" ]; then
