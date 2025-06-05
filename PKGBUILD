@@ -179,7 +179,7 @@ _minor=1
 #
 # WARNING: i have NO CLUE if this option works.
 #
-# if you distribute your kernel, set this to either one of `x86-64-v3`, `x86-64-v2` or `x86-64-v1`)[^1]
+# if you distribute your kernel, set this to either one of `x86-64-v3`, `x86-64-v2` or `x86-64`)[^1]
 #
 # if you want to optimize for your current cpu, set native_amd or native_intel depending on your CPU, or if you know your exact arch (in my case, my Ryzen 7 8745HS is `znver4`[^1], my `i7-10510U` is skylake, my A4-6210 is `btver2`[^2])
 #
@@ -189,7 +189,7 @@ _minor=1
 #
 # [^1]: the kernel doesn't seem to utilize x86-64-v4 code, hence, it'd possibly break stuff if you set to x86-64-v4
 # [^2]: WTF amd? why not `zen4` or `jaugar`? wtf is "btver2"?
-: "${_processor_opt:=generic}"
+: "${_processor_opt:=x86-64}"
 
 # supported cpu processor vendors
 #
