@@ -16,8 +16,8 @@
 # only change this if you need a specific kernel. make sure to run `rm *.patch` prior to ensure you have the right patches
 #
 # consider `git fetch && git pull` if you're updating the kernel instead
-_major=6.14
-_minor=8
+_major=6.15
+_minor=1
 
 # include cachyos patchset?
 #
@@ -177,24 +177,19 @@ _minor=8
 
 # optimize kernel for a specific processor
 #
-# this can be left empty, but will prompt when building, unless `_use_auto_optimization` is set to `yes`
+# WARNING: i have NO CLUE if this option works.
 #
-# if you distribute your kernel, set `_use_auto_optimization` (below) to no and set this to GENERIC_V3 (for x86-64-v3), GENERIC_V2 (for x86-64-v2) or GENERIC (x86-64-v1)
+# if you distribute your kernel, set this to either one of `x86-64-v3`, `x86-64-v2` or `x86-64-v1`)[^1]
 #
-# if you want to optimize for your current cpu, set native_amd or native_intel depending on your CPU, or if you know your exact arch (in my case, my Ryzen 7 8745HS is ZEN4, my i7-10510U is SKYLAKE, my A4-6210 is JAGUAR[^1])
+# if you want to optimize for your current cpu, set native_amd or native_intel depending on your CPU, or if you know your exact arch (in my case, my Ryzen 7 8745HS is `znver4`[^1], my `i7-10510U` is skylake, my A4-6210 is `btver2`[^2])
 #
-# if unsure, select `GENERIC`
+# if you want to optimize for the local machine, say `native`
 #
-# [^1]: the A4-6210 is actually btver2, but the patches demand jaguar for some reason. read the `auto-cpu-optimization.sh` script for all options
-: "${_processor_opt:=}"
-
-# autodetects current CPU and optimizes for it
-# the _processor_opt option will be ignored if this is set.
+# if unsure, say `generic`
 #
-# this is essentally -march=native
-#
-# if you distribute your kernel, make sure to set this to n, and set `_processor_opt` to a correct value (see its documentation)
-: "${_use_auto_optimization:=yes}"
+# [^1]: the kernel doesn't seem to utilize x86-64-v4 code, hence, it'd possibly break stuff if you set to x86-64-v4
+# [^2]: WTF amd? why not `zen4` or `jaugar`? wtf is "btver2"?
+: "${_processor_opt:=generic}"
 
 # supported cpu processor vendors
 #
@@ -736,6 +731,7 @@ if _is_lto_kernel; then
         LD=ld.lld
         LLVM=1
         LLVM_IAS=1
+        KCFLAGS=-march=${_processor_opt}
     )
 fi
 
