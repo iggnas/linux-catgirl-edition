@@ -132,7 +132,7 @@ _minor=1
 # kernel tickrate
 #
 # full tickless is where timer ticks stop even when a CPU is active whenever possible. it is aimed at high performance
-#               low latency systems. may require special configuration to fully take advantage of. otherwise, behaves
+#               low latency systems. requires special configuration to fully take advantage of. otherwise, behaves
 #               exactly the same as idle
 # idle tickless stops timer ticks when all CPUs are idle. better energy efficiency
 # periodic is suitable for real-time systems, but is not power efficient at all.
@@ -148,10 +148,10 @@ _minor=1
 # `voluntary` preemption only preempts tasks at specific points. slightly worse latency than lazy, but better
 #        throughput than lazy
 # `none` (or also known as 'server') preemption provides best throughput by only allowing sysret and interrupts as
-#        the only source of interrupts. not particually great for desktop systems
+#        the only source of preemption. often you'll still get acceptable latency, but no promises are made.
 #
 # NOTE: this option is ignored if `_cpusched` is set to `rt` or `rt-bore`. in that case, all kernel code
-#       will be preemptable except for a few critical sections.
+#       will be preemptable except for a few critical sections that use `raw_spinlock_t`
 #
 # if unsure, select `lazy`
 #
@@ -177,13 +177,13 @@ _minor=1
 
 # optimize kernel for a specific processor
 #
-# WARNING: i have NO CLUE if this option works.
-#
 # if you distribute your kernel, set this to either one of `x86-64-v3`, `x86-64-v2` or `x86-64`)[^1]
 #
-# if you want to optimize for your current cpu, set native_amd or native_intel depending on your CPU, or if you know your exact arch (in my case, my Ryzen 7 8745HS is `znver4`[^1], my `i7-10510U` is skylake, my A4-6210 is `btver2`[^2])
+# if you know your exact arch (in my case, my Ryzen 7 8745HS is `znver4`[^1], my `i7-10510U` is `skylake`, my A4-6210 is `btver2`[^2])
 #
 # if you want to optimize for the local machine, say `native`
+#
+# don't worry about getting this option wrong; the compile will simply fail, showing you the available values
 #
 # if unsure, say `generic`
 #
@@ -472,11 +472,7 @@ _minor=1
 #
 # if you do not know what a 'segfault' is, you probably can disable this to reduce memory usage.
 #
-# might break systemd-coredumpd[^1]
-#
 # if unsure, say yes
-#
-# [^1]: systemd has a history of killing itself over the smallest disabled kernel feature
 : "${_no_core_dump:=yes}"
 
 # disables dmesg functionality
@@ -580,7 +576,7 @@ _minor=1
 #
 # i am unclear of the performance improvements this offers.
 # this may break certain userspace apps that make use of this, for example, pacman seems to rely on landlock[^1]
-# likely to prevent unwanted script execution, and im pretty sure flatpak uses one of these.
+# likely to prevent unwanted script execution.
 #
 # CAUTION: LSMs are standard linux kernel features, used in production kernels such as the Android kernel (thats almost a billion kernels).
 # Only disable if you can't afford the extra code in ring 0
