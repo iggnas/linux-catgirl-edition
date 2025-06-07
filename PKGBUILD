@@ -499,6 +499,20 @@ _minor=1
 # if unsure, say `no`
 : "${_psi_mode:=no}"
 
+# Remove legacy features
+#
+# (not part of disabling 32 bit because steam isn't 'legacy' per se, even though it runs 32 bit binaries)
+#
+# disables:
+# - `X86_VSYSCALL_EMULATION`: required by legacy programs prior to 2013, otherwise it will segfault, citing the 0xffffffffff600?00 address.
+#                             saves 7kb kernel size and 4kb pagetable memory
+# - `X86_IOPL_IOPERM`: disables `ioperm()` and `iopl()` syscalls which are needed by legacy applications
+# enables:
+# - `CONFIG_LEGACY_VSYSCALL_NONE`: no vsyscall mappings at all to eliminate risks of ASLR bypass
+#
+# if unsure, say yes. if any apps crash, say no
+: "${_disable_legacy_features:=yes}"
+
 #
 # Bugging
 # Disable debugging features for size and performance
@@ -1092,6 +1106,13 @@ prepare() {
         no) scripts/config -d PSI ;;
         *) _die "The value $_psi_mode is invalid. Pick the right option." ;;
     esac
+
+    if [ "$_disable_legacy_features" = "yes" ]; then
+        echo "Disable legacy features"
+        scripts/config -d CONFIG_LEGACY_VSYSCALL_XONLY -e CONFIG_LEGACY_VSYSCALL_NONE \
+            -d X86_VSYSCALL_EMULATION \
+            -d X86_IOPL_IOPERM
+    fi
 
     if [ "$_advanced_partition" = "no" ]; then
         echo "Disable advanced partition"
