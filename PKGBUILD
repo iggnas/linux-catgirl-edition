@@ -24,6 +24,19 @@ _minor=1
 # generally, you should keep this enabled
 : "${_import_cachyos_patchset:=yes}"
 
+# include le9uo?
+#
+# le9uo improves responsiveness by protecting the working set during memory pressure and out of memory conditions.
+# normally, you should find a way to prevent entering the low memory condition for optimal performance, but computers are unpredictable.
+#
+# le9uo may trigger the oom killer early.
+# fine-tune it here: https://github.com/firelzrd/le9uo/blob/main/supplemental-assets/Method%20C.%20post-boot/50-sysctl-examples.conf
+#
+# you can verify this is compiled and working properly by a) checking dmesg for `le9uo` or running `sysctl vm.workingset_protection`
+#
+# if unsure, say yes. it won't hurt to have just in case
+: "${_import_le9uo_patchset:=yes}"
+
 # select a CPU scheduler
 #
 # possible options & explaination:
@@ -713,19 +726,22 @@ makedepends=(
   zstd
 )
 
-_patchsource="https://raw.githubusercontent.com/cachyos/kernel-patches/master/${_major}"
+_patchsource_cachyos="https://raw.githubusercontent.com/cachyos/kernel-patches/master/${_major}"
+# _patchsource_le9uo="https://raw.githubusercontent.com/firelzrd/le9uo/refs/heads/main/le9uo_patches/stable/0001-linux6.15.y-le9uo-1.15.patch"
+# _patchsource_le9uo="https://raw.githubusercontent.com/firelzrd/le9uo/refs/heads/main/le9uo_patches/stable/0001-linux${_major}.y-le9uo-1.15.patch" # update when le9uo updates
+_patchsource_le9uo="https://raw.githubusercontent.com/firelzrd/le9uo/refs/heads/main/le9uo_patches/" # update when le9uo updates
 _nv_ver=570.133.07
 _nv_pkg="NVIDIA-Linux-x86_64-${_nv_ver}"
 _nv_open_pkg="NVIDIA-kernel-module-source-${_nv_ver}"
 source=(
     "https://cdn.kernel.org/pub/linux/kernel/v${pkgver%%.*}.x/${_srcname}.tar.xz"
     "config"
-    "${_patchsource}/all/0001-cachyos-base-all.patch")
+    "${_patchsource_cachyos}/all/0001-cachyos-base-all.patch")
 
 # LLVM makedepends
 if _is_lto_kernel; then
     makedepends+=(clang llvm lld)
-    source+=("${_patchsource}/misc/dkms-clang.patch")
+    source+=("${_patchsource_cachyos}/misc/dkms-clang.patch")
     BUILD_FLAGS=(
         CC=clang
         LD=ld.lld
@@ -735,27 +751,32 @@ if _is_lto_kernel; then
     )
 fi
 
+if [ "$_import_le9uo_patchset" = "yes" ]; then
+    source+=("${_patchsource_le9uo}/stable/0001-linux${_major}.y-le9uo-1.15.patch"
+             "${_patchsource_le9uo}/0002-vm.workingset_protection-On-by-default.patch")
+fi
+
 # NVIDIA pre-build module support
 if [ "$_build_nvidia" = "yes" ]; then
     source+=("https://us.download.nvidia.com/XFree86/Linux-x86_64/${_nv_ver}/${_nv_pkg}.run"
-             "${_patchsource}/misc/nvidia/0001-Make-modeset-and-fbdev-default-enabled.patch")
+             "${_patchsource_cachyos}/misc/nvidia/0001-Make-modeset-and-fbdev-default-enabled.patch")
 fi
 
 if [ "$_build_nvidia_open" = "yes" ]; then
     source+=("https://download.nvidia.com/XFree86/${_nv_open_pkg%"-$_nv_ver"}/${_nv_open_pkg}.tar.xz"
-             "${_patchsource}/misc/nvidia/0001-Make-modeset-and-fbdev-default-enabled.patch"
-             "${_patchsource}/misc/nvidia/0003-Add-IBT-Support.patch")
+             "${_patchsource_cachyos}/misc/nvidia/0001-Make-modeset-and-fbdev-default-enabled.patch"
+             "${_patchsource_cachyos}/misc/nvidia/0003-Add-IBT-Support.patch")
 fi
 
 case "$_cpusched" in
     bore|rt-bore|hardened) # Bore Scheduler
-        source+=("${_patchsource}/sched/0001-bore-cachy.patch");;&
+        source+=("${_patchsource_cachyos}/sched/0001-bore-cachy.patch");;&
     bmq) # Project C Scheduler
-        source+=("${_patchsource}/sched/0001-prjc-cachy.patch");;
+        source+=("${_patchsource_cachyos}/sched/0001-prjc-cachy.patch");;
     hardened) # Hardened Patches
-        source+=("${_patchsource}/misc/0001-hardened.patch");;
+        source+=("${_patchsource_cachyos}/misc/0001-hardened.patch");;
     rt|rt-bore) # RT patches
-        source+=("${_patchsource}/misc/0001-rt-i915.patch");;
+        source+=("${_patchsource_cachyos}/misc/0001-rt-i915.patch");;
 esac
 
 export KBUILD_BUILD_USER="$pkgbase"
@@ -774,7 +795,7 @@ prepare() {
     for src in "${source[@]}"; do
         src="${src%%::*}"
         # Skip nvidia patches
-        [[ "$src" == "${_patchsource}"/misc/nvidia/*.patch ]] && continue
+        [[ "$src" == "${_patchsource_cachyos}"/misc/nvidia/*.patch ]] && continue
         src="${src##*/}"
         src="${src%.zst}"
         [[ $src = *.patch ]] || continue
