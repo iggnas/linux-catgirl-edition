@@ -730,7 +730,7 @@ _patchsource_cachyos="https://raw.githubusercontent.com/cachyos/kernel-patches/m
 # _patchsource_le9uo="https://raw.githubusercontent.com/firelzrd/le9uo/refs/heads/main/le9uo_patches/stable/0001-linux6.15.y-le9uo-1.15.patch"
 # _patchsource_le9uo="https://raw.githubusercontent.com/firelzrd/le9uo/refs/heads/main/le9uo_patches/stable/0001-linux${_major}.y-le9uo-1.15.patch" # update when le9uo updates
 _patchsource_le9uo="https://raw.githubusercontent.com/firelzrd/le9uo/refs/heads/main/le9uo_patches/" # update when le9uo updates
-_nv_ver=570.133.07
+_nv_ver=575.57.08
 _nv_pkg="NVIDIA-Linux-x86_64-${_nv_ver}"
 _nv_open_pkg="NVIDIA-kernel-module-source-${_nv_ver}"
 source=(
@@ -759,13 +759,14 @@ fi
 # NVIDIA pre-build module support
 if [ "$_build_nvidia" = "yes" ]; then
     source+=("https://us.download.nvidia.com/XFree86/Linux-x86_64/${_nv_ver}/${_nv_pkg}.run"
-             "${_patchsource_cachyos}/misc/nvidia/0001-Make-modeset-and-fbdev-default-enabled.patch")
+             "${_patchsource_cachyos}/misc/nvidia/0001-Enable-atomic-kernel-modesetting-by-default.patch"
+             "${_patchsource_cachyos}/misc/nvidia/0003-Workaround-nv_vm_flags_-calling-GPL-only-code.patch")
 fi
 
 if [ "$_build_nvidia_open" = "yes" ]; then
     source+=("https://download.nvidia.com/XFree86/${_nv_open_pkg%"-$_nv_ver"}/${_nv_open_pkg}.tar.xz"
-             "${_patchsource_cachyos}/misc/nvidia/0001-Make-modeset-and-fbdev-default-enabled.patch"
-             "${_patchsource_cachyos}/misc/nvidia/0003-Add-IBT-Support.patch")
+             "${_patchsource_cachyos}/misc/nvidia/0001-Enable-atomic-kernel-modesetting-by-default.patch"
+             "${_patchsource_cachyos}/misc/nvidia/0002-Add-IBT-support.patch")
 fi
 
 case "$_cpusched" in
