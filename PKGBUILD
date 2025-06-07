@@ -1440,7 +1440,7 @@ _package-nvidia-open(){
 }
 
 pkgname=("$pkgbase")
-pkgname+=("$pkgbase-headers")
+[ "$_package_headers" = "yes" ] && pkgname+=("$pkgbase-headers")
 [ "$_build_nvidia" = "yes" ] && pkgname+=("$pkgbase-nvidia")
 [ "$_build_nvidia_open" = "yes" ] && pkgname+=("$pkgbase-nvidia-open")
 for _p in "${pkgname[@]}"; do
