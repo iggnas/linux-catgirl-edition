@@ -178,12 +178,17 @@ _minor=1
 # optimize kernel for a specific processor
 #
 # if you distribute your kernel, set this to either one of `x86-64-v3`, `x86-64-v2` or `x86-64`)[^1]
-#
-# if you know your exact arch (in my case, my Ryzen 7 8745HS is `znver4`[^1], my `i7-10510U` is `skylake`, my A4-6210 is `btver2`[^2])
-#
+# if you know your exact arch (in my case, my Ryzen 7 8745HS is `znver4`[^2], my `i7-10510U` is `skylake`, my A4-6210 is `btver2`[^2])
 # if you want to optimize for the local machine, say `native`
 #
 # don't worry about getting this option wrong; the compile will simply fail, showing you the available values
+#
+# optimizing the kernel can offer some advantages. by supplying the architecture to optimize for, the compiler
+# can make better decisions on loop unrolling, code layout and inlining w.r.t. cache sizes (L1i, L2, L3)
+#
+# the kernel is unlikely to run any special instructions because `-mno-avx` and friends are passed through various
+# kernel makefiles, except when explicitly used when set by `kernel_fpu_begin()` and terminated by `kernel_fpu_end()`
+# note that CRC routines contain optimized copies irrespective of this option, so if you use LUKS this option is mostly optional
 #
 # if unsure, say `generic`
 #
