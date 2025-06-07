@@ -478,6 +478,27 @@ _minor=1
 # if unsure, say yes
 : "${_disable_irq_time_accounting:=yes}"
 
+# Pressure Stall Information tracking (PSI)
+#
+# PSI is a linux kernel that provides insight into resource contention. Its a nifty feature for fine-tuning your system for
+# bottlenecks in CPU; IO; memory; IRQs.
+#
+# it is used by some monitoring applications to proactively try to restabilize a system during
+# high contention times, such as oomd, systemd-oomd and nohang[^1]
+#
+# valid options:
+# - `yes`: PSI tracking enabled by default; has runtime performance overhead by default
+# - `optin`: require kernel parameter[^2] to enable PSI tracking; negligible runtime performance overhead by default[^3]
+# - `no`: PSI tracking not compiled; no performance overhead and lower memory usage
+#
+# [^1]: nohang has optional PSI integration and is not a hard dependency
+# [^2]: that being `psi=1`
+# [^3]: the kernel docs say that this option adds some code to task wakeup and sleep in the scheduler that may show up
+#       in stress tests, but is in practice negligible
+#
+# if unsure, say `no`
+: "${_psi_mode:=no}"
+
 #
 # Bugging
 # Disable debugging features for size and performance
@@ -1064,6 +1085,14 @@ prepare() {
         scripts/config -d IRQ_TIME_ACCOUNTING
     fi
 
+    echo "Set PSI mode to $_psi_mode"
+    case "$_psi_mode" in
+        yes) ;; # nothing; default in kernel
+        optin) scripts/config -e PSI_DEFAULT_DISABLED ;;
+        no) scripts/config -d PSI ;;
+        *) _die "The value $_psi_mode is invalid. Pick the right option." ;;
+    esac
+
     if [ "$_advanced_partition" = "no" ]; then
         echo "Disable advanced partition"
         scripts/config -d PARTITION_ADVANCED
@@ -1457,3 +1486,4 @@ b2sums=('11835719804b406fe281ea1c276a84dc0cbaa808552ddcca9233d3eaeb1c001d0455c72
         '83460f7c8da099f97cbee7dd7c724eec7be1b8e72640209a6a00c860d0c780b6672a8fa574270c0048f7f2da886ce4b8aacd2a433d871fcdbbaac07a48857312'
         'c7294a689f70b2a44b0c4e9f00c61dbd59dd7063ecbe18655c4e7f12e21ed7c5bb4f5169f5aa8623b1c59de7b2667facb024913ecb9f4c650dabce4e8a7e5452'
         'b8b3feb90888363c4eab359db05e120572d3ac25c18eb27fef5714d609c7cb895243d45585a150438fec0a2d595931b10966322cd956818dbd3a9b3ef412d1e8')
+
