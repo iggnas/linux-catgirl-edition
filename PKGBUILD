@@ -786,7 +786,7 @@ if _is_lto_kernel; then
 fi
 
 if [ "$_import_le9uo_patchset" = "yes" ]; then
-    source+=("${_patchsource_le9uo}/stable/0001-linux${_major}.y-le9uo-${_le9uo_ver}.patch"
+    source+=("${_patchsource_le9uo}/stable/0001-linux${_major}.y-le9uo-${_le9uo_ver}a.patch"
              "${_patchsource_le9uo}/0002-vm.workingset_protection-On-by-default.patch")
 fi
 
