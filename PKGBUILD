@@ -762,9 +762,7 @@ makedepends=(
 )
 
 _patchsource_cachyos="https://raw.githubusercontent.com/cachyos/kernel-patches/master/${_major}"
-# _patchsource_le9uo="https://raw.githubusercontent.com/firelzrd/le9uo/refs/heads/main/le9uo_patches/stable/0001-linux6.15.y-le9uo-1.15.patch"
-# _patchsource_le9uo="https://raw.githubusercontent.com/firelzrd/le9uo/refs/heads/main/le9uo_patches/stable/0001-linux${_major}.y-le9uo-1.15.patch" # update when le9uo updates
-_patchsource_le9uo="https://raw.githubusercontent.com/firelzrd/le9uo/refs/heads/main/le9uo_patches/" # update when le9uo updates
+_patchsource_le9uo="https://raw.githubusercontent.com/firelzrd/le9uo/refs/heads/main/le9uo_patches" # update when le9uo updates
 _nv_ver=575.57.08
 _nv_pkg="NVIDIA-Linux-x86_64-${_nv_ver}"
 _nv_open_pkg="NVIDIA-kernel-module-source-${_nv_ver}"
