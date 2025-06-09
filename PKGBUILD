@@ -762,8 +762,9 @@ makedepends=(
 )
 
 _patchsource_cachyos="https://raw.githubusercontent.com/cachyos/kernel-patches/master/${_major}"
-_patchsource_le9uo="https://raw.githubusercontent.com/firelzrd/le9uo/refs/heads/main/le9uo_patches"
+_le9uo_commit_hash="67ce3c2da64654764740765bf882b321b586eb9f"
 _le9uo_ver=1.15
+_patchsource_le9uo="https://raw.githubusercontent.com/firelzrd/le9uo/${_le9uo_commit_hash}/le9uo_patches"
 _nv_ver=575.57.08
 _nv_pkg="NVIDIA-Linux-x86_64-${_nv_ver}"
 _nv_open_pkg="NVIDIA-kernel-module-source-${_nv_ver}"
@@ -786,7 +787,7 @@ if _is_lto_kernel; then
 fi
 
 if [ "$_import_le9uo_patchset" = "yes" ]; then
-    source+=("${_patchsource_le9uo}/stable/0001-linux${_major}.y-le9uo-${_le9uo_ver}a.patch"
+    source+=("${_patchsource_le9uo}/stable/base/0001-linux${_major}.y-le9uo-${_le9uo_ver}.patch"
              "${_patchsource_le9uo}/0002-vm.workingset_protection-On-by-default.patch")
 fi
 
