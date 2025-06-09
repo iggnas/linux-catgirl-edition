@@ -679,7 +679,7 @@ _minor=1
 #
 # interestingly, the linux kernel has this disabled by default, but arch kernel enables this.
 #
-# if unsure, say yes
+# if unsure, say no
 : "${_no_checking_linkedlist_integrity:=no}"
 
 # disable stack corruption on schedule()
@@ -721,6 +721,14 @@ _minor=1
 #
 # if unsure, say no
 : "${_no_ibt:=no}"
+
+# disable hardening of the kernel slab allocater freelist
+#
+# this is a security feature that protects the slab cache metadata. it incurs a tiny performance penalty for security.
+# requires an existing kernel bug to reduce your security.
+#
+# if unsure, say no
+: "${_no_harden_freelist_metadata:=no}"
 
 # and thats basically it. after comes the logic
 # prepare some bleach if you plan to scroll
@@ -1271,6 +1279,11 @@ prepare() {
     if [ "$_no_ibt" = "yes" ]; then
         echo "No IBT"
         scripts/config -d X86_KERNEL_IBT
+    fi
+
+    if [ "$_no_harden_freelist_metadata" = "yes" ]; then
+        echo "No freelist hardening"
+        scripts/config -d SLAB_FREELIST_HARDENED
     fi
 
     # # Rewrite configuration
