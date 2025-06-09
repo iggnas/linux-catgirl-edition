@@ -171,19 +171,24 @@ _minor=1
 # [^1]: except critical sections
 : "${_preempt:=lazy}"
 
+# Transparent Huge Pages (THP)
+#
 # manages memory allocation using larger pages (usually 2 MB) instead of 4 KB pages for performance.
 #
-# `always`:  always attempts hugepages for allocations. this may cause applications to use more memory than needed, if
-#            the application is poorly designed and only uses a small portion of the `mmap`ed memory.
-#            (applications may opt-out through special syscalls, but most apps probably don't)
-# `madvise`: only attempts hugepage allocation when applications specifically requests it. this may be more
-#            memory efficient as hugepages are only used when needed
+# `always`:   always attempts hugepages for allocations. this may cause applications to use more memory than needed, if
+#             the application is poorly designed and only uses a small portion of the `mmap`ed memory.
+#             (applications may opt-out through special syscalls, but most apps probably don't)
+# `madvise`:  only attempts hugepage allocation when applications specifically requests it. this may be more
+#             memory efficient as hugepages are only used when needed
+# `never`:    disables THP by default, but can still be enabled at runtime
+# `disabled`: does not compile THP at all. lowest memory usage. only recommended on embedded
 #
-# can't choose? you can set this at runtime:
+# can't choose? you can set this at runtime (except for the `disabled` option):
 # echo always > /sys/kernel/mm/transparent_hugepage/enabled
 # or just set here and https://tryitands.ee
 #
 # you may perfer `madvise` if your system is low on memory (<1 GB)
+# if you have very low memory (i.e. embedded or <200 mb), you may want `disabled`
 #
 # if unsure, select `always`
 : "${_hugepage:=always}"
@@ -962,6 +967,8 @@ prepare() {
     case "$_hugepage" in
         always) scripts/config -d TRANSPARENT_HUGEPAGE_MADVISE -e TRANSPARENT_HUGEPAGE_ALWAYS;;
         madvise) scripts/config -d TRANSPARENT_HUGEPAGE_ALWAYS -e TRANSPARENT_HUGEPAGE_MADVISE;;
+        never) scripts/config -d TRANSPARENT_HUGEPAGE_ALWAYS -d TRANSPARENT_HUGEPAGE_MADVISE -e TRANSPARENT_HUGEPAGE_NEVER;;
+        disabled) scripts/config -d TRANSPARENT_HUGEPAGE;;
         *) _die "The value '$_hugepage' is invalid. Choose the correct one again.";;
     esac
 
