@@ -580,6 +580,18 @@ _minor=1
 # if unsure, say yes
 : "${_disable_debugging:=yes}"
 
+# disable ACPI Platform Error Interface (APEI)
+#
+# APEI allows error reporting to the OS. It improves NMI handling should it occur, but if you encounter these, i'd say you
+# have a worse problem on your hands
+#
+# you can also do error injection, but EI is mostly for kernel devs to make sure the system is working
+#
+# as a treat, this also disables CONFIG_PSTORE (if possible) for lower memory usage
+#
+# if unsure, say yes
+: "${_disable_apei:=yes}"
+
 # disable BTF type generation
 #
 # WARNING: kernel compilation may FAIL if this and _package_headers is set to yes
@@ -1223,6 +1235,11 @@ prepare() {
             -d DEBUG_RODATA_TEST
 
         # TODO: does BLK_DEBUG_FS disable changing io scheduler at runtime?
+    fi
+
+    if [ "$_disable_apei" = "yes" ]; then
+        echo "Disable APEI & pstore"
+        scripts/config -d ACPI_APEI -d PSTORE
     fi
 
     if [ "$_package_headers" = "no" ]; then
