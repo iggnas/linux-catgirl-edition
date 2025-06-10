@@ -24,19 +24,6 @@ _minor=1
 # generally, you should keep this enabled
 : "${_import_cachyos_patchset:=yes}"
 
-# include le9uo?
-#
-# le9uo improves responsiveness by protecting the working set during memory pressure and out of memory conditions.
-# normally, you should find a way to prevent entering the low memory condition for optimal performance, but computers are unpredictable.
-#
-# le9uo may trigger the oom killer early.
-# fine-tune it here: https://github.com/firelzrd/le9uo/blob/main/supplemental-assets/Method%20C.%20post-boot/50-sysctl-examples.conf
-#
-# you can verify this is compiled and working properly by a) checking dmesg for `le9uo` or running `sysctl vm.workingset_protection`
-#
-# if unsure, say yes. it won't hurt to have just in case
-: "${_import_le9uo_patchset:=yes}"
-
 # select a CPU scheduler
 #
 # possible options & explaination:
@@ -809,9 +796,6 @@ makedepends=(
 )
 
 _patchsource_cachyos="https://raw.githubusercontent.com/cachyos/kernel-patches/master/${_major}"
-_le9uo_commit_hash="67ce3c2da64654764740765bf882b321b586eb9f"
-_le9uo_ver=1.15
-_patchsource_le9uo="https://raw.githubusercontent.com/firelzrd/le9uo/${_le9uo_commit_hash}/le9uo_patches"
 _nv_ver=575.57.08
 _nv_pkg="NVIDIA-Linux-x86_64-${_nv_ver}"
 _nv_open_pkg="NVIDIA-kernel-module-source-${_nv_ver}"
@@ -831,11 +815,6 @@ if _is_lto_kernel; then
         LLVM_IAS=1
         KCFLAGS=-march=${_processor_opt}
     )
-fi
-
-if [ "$_import_le9uo_patchset" = "yes" ]; then
-    source+=("${_patchsource_le9uo}/stable/base/0001-linux${_major}.y-le9uo-${_le9uo_ver}.patch"
-             "${_patchsource_le9uo}/0002-vm.workingset_protection-On-by-default.patch")
 fi
 
 # NVIDIA pre-build module support
