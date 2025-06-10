@@ -349,6 +349,22 @@ _minor=1
 #       of it.
 : "${_maximum_gpus:=10}"
 
+# maximum amount of CPUs supported
+#
+# reduces the amount of CPUs[^1] the kernel will support. each CPU adds an approx ~8 KB to the kernel image and therefore
+# kernel memory usage.
+#
+# available options:
+# - `default`: does not touch this option at all. use when compiling a generic kernel or if you don't know the hardware the kernel
+#              run at
+# - ANY INTEGER: configures the kernel to only support x CPUs. (i.e. saying 4 will make the kernel only support 4 CPUs)
+#
+# if unsure, leave at `default`
+#
+# [^1]: CPUs in this case does not refer to physical CPU packages. it refers to threads[^2]. WTF torvalds?
+# [^2]: if your CPU does not have hyperthreading/symmetrical multithreading, then use cores.
+: "${_maximum_cpus:=default}"
+
 # disable FUSE support
 #
 # FUSE allows running a custom filesystem in userspace.
@@ -1056,6 +1072,11 @@ prepare() {
 
     echo "Set maximum # of GPUs"
     scripts/config --set-val CONFIG_VGA_ARB_MAX_GPUS "${_maximum_gpus}"
+
+    case "$_maximum_cpus" in
+        default) ;;
+        *) scripts/config -d MAXSMP --set-val NR_CPUS $_maximum_cpus;;
+    esac
 
     if [ "$_disable_fuse" = "yes" ]; then
         echo "Disable FUSE"
