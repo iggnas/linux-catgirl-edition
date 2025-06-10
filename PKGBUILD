@@ -279,6 +279,28 @@ _minor=1
 # if unsure, say yes
 : "${_package_headers:=yes}"
 
+# full monolithic kernel?
+#
+# this will disable module support in linux, forcing all modules to be loaded at startup rather than dynamically.
+# this **may** improve boot performance, may reduce memory usage by removing module infrastructure (assuming the costs of this offsets
+# the cost of loading all modules compiled into the kernel)
+# the utility use for this option is to create a standalone kernel binary such that you do not need to copy /lib/modules/kernel-name (i.e. dualbooting different distros with the same kernel)
+# might be useful for server or embedded systems
+#
+# may be more secure as users simply cannot `insmod` modules into the kernel.
+#
+# NOTE: this is not suitable for desktop usage; firmware loading seems to not work (amdgpu does not load its firmware, so the DRM
+#       subsystem isn't initialized properly)
+#
+# NOTE: this isn't a 100% guarntee that CONFIG_MODULES will be disabled; it may be switched back on by the kernel build system
+#       if something requires CONFIG_MODULES=y
+#
+# WARNING: do NOT enable if you are compiling a full kernel (i.e. _localmodcfg) because this might load _all_ modules, increasing
+#          memory usage and/or making the /bzImage (kernel) binary extremely large
+#
+# if unsure, say no
+: "${_full_monolithic:=no}"
+
 # automatically answer the default answer in make prepare?
 #
 # needed in CI (if you cant interact with it), or if there is an overwhelmingly large amount of options.
@@ -1310,6 +1332,11 @@ prepare() {
         scripts/config -d SLAB_FREELIST_HARDENED
     fi
 
+    if [ "$_full_monolithic" = "yes" ]; then
+        echo "Full monolithic"
+        scripts/config -d MODULES
+    fi
+
     # # Rewrite configuration
     # echo "Rewrite configuration..."
     # make "${BUILD_FLAGS[@]}" prepare
@@ -1391,6 +1418,10 @@ _package() {
 
     # Used by mkinitcpio to name the kernel
     echo "$pkgbase" | install -Dm644 /dev/stdin "$modulesdir/pkgbase"
+
+    if [ "$_full_monolithic" ]; then
+        return
+    fi
 
     echo "Installing modules..."
     ZSTD_CLEVEL=19 make "${BUILD_FLAGS[@]}" INSTALL_MOD_PATH="$pkgdir/usr" INSTALL_MOD_STRIP=1 \
