@@ -1419,7 +1419,7 @@ _package() {
     # Used by mkinitcpio to name the kernel
     echo "$pkgbase" | install -Dm644 /dev/stdin "$modulesdir/pkgbase"
 
-    if [ "$_full_monolithic" ]; then
+    if [ "$_full_monolithic" = "yes" ]; then
         return
     fi
 
