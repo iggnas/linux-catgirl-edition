@@ -58,6 +58,12 @@ note that not all optimizations are enabled by default.
 
 </details>
 
+## What does linux-catgirl-edition not do?
+
+linux-catgirl-edition avoids doing tweaks that can be easier set during runtime instead of compile time. that means sysctl values will still have to be set by you.
+
+this kernel only changes things that cannot be easily changed or straight up impossible to change during runtime (e.g. module support)
+
 ---
 
 ## Where can I get linux-catgirl-edition?
