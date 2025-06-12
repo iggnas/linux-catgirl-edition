@@ -85,17 +85,6 @@ _minor=2
 # if unsure, select yes
 : "${_cflags_O3:=yes}"
 
-# use `performance` governor by default?
-#
-# DEPRECATED: since linux-5.8.y, the `cpufreq.default_governor` cmdline parameter has been introduced. if you wish to set performance as default governor,
-#             add `cpufreq.default_governor=performance` to your kernel cmdline.
-#             this option will be REMOVED when linux-6.15 comes along.
-#
-# generally, you should let something like gamemode to set the performance governor at runtime, so leave at 'no',
-#            unless you don't care about heat and electricity bills.
-#            leave disabled on laptops; thermal throttling will impact performance and battery life will suffer.
-: "${_perf_governor_default:=no}"
-
 # enable Google's TCP BBR3
 #
 # https://www.phoronix.com/news/Google-BBRv3-Linux
@@ -922,13 +911,6 @@ prepare() {
     esac
 
     echo "Setting tick rate to ${_HZ_ticks}Hz..."
-
-    # Select performance governor
-    if [ "$_perf_governor_default" = "yes" ]; then
-        echo "Setting performance governor..."
-        scripts/config -d CPU_FREQ_DEFAULT_GOV_SCHEDUTIL \
-            -e CPU_FREQ_DEFAULT_GOV_PERFORMANCE
-    fi
 
     # Select tick type
     case "$_tickrate" in
