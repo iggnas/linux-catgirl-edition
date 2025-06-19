@@ -761,6 +761,19 @@ _minor=2
 # if unsure, say no
 : "${_no_harden_freelist_metadata:=no}"
 
+# disable CPU mitigations
+#
+# disable compiling any sort of CPU mitigations into the kernel
+# this may reduce overhead during syscalls as conditional checks are no longer present (because you can toggle
+# mitigations at boot-time), but will make it so **the kernel has no mitigations** against bugs that allow processes
+# to read memory that they do not own.
+#
+# NOTE: modern zen4 systems are designed from the ground up to handle spectre mitigations, so you will **LOSE** performance
+# on those systems if you disable this.
+#
+# if unsure, say no
+: "${_no_cpu_mitigations:=no}"
+
 # and thats basically it. after comes the logic
 # prepare some bleach if you plan to scroll
 
@@ -1312,6 +1325,11 @@ prepare() {
     if [ "$_no_harden_freelist_metadata" = "yes" ]; then
         echo "No freelist hardening"
         scripts/config -d SLAB_FREELIST_HARDENED
+    fi
+
+    if [ "$_no_cpu_mitigations" = "yes" ]; then
+        echo "No CPU mitigations"
+        scripts/config -d CPU_MITIGATIONS
     fi
 
     if [ "$_full_monolithic" = "yes" ]; then
