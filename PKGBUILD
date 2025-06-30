@@ -838,8 +838,7 @@ fi
 # NVIDIA pre-build module support
 if [ "$_build_nvidia" = "yes" ]; then
     source+=("https://us.download.nvidia.com/XFree86/Linux-x86_64/${_nv_ver}/${_nv_pkg}.run"
-             "${_patchsource_cachyos}/misc/nvidia/0001-Enable-atomic-kernel-modesetting-by-default.patch"
-             "${_patchsource_cachyos}/misc/nvidia/0003-Workaround-nv_vm_flags_-calling-GPL-only-code.patch")
+             "${_patchsource_cachyos}/misc/nvidia/0001-Enable-atomic-kernel-modesetting-by-default.patch")
 fi
 
 if [ "$_build_nvidia_open" = "yes" ]; then
