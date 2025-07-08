@@ -389,8 +389,12 @@ _minor=5
 
 # disable zswap
 #
-# use zram instead.
-# never use a disk swapfile if you like performance and want the drive to last longer.
+# use zram instead. zswap interferes with zram because zswap works on evicted memory pages first, before zram can intercept them.
+# alternatively, you may add the `zswap.enabled=0` kernel parameter to disable zswap if you will be tentatively using zswap
+#
+# avoid using a disk swapfile if you like performance and want the drive to last longer.
+# if you experience frequent swapping, obviously, try to resolve that first instead of throwing hardware at the problem,
+# you're using linux, we dont do that here
 #
 # if your system is very low on ram, fine. go use zswap.
 #
@@ -499,8 +503,8 @@ _minor=5
 
 # Pressure Stall Information tracking (PSI)
 #
-# PSI is a linux kernel that provides insight into resource contention. Its a nifty feature for fine-tuning your system for
-# bottlenecks in CPU; IO; memory; IRQs.
+# PSI is a linux kernel feature that provides insight into resource contention. Its a nifty feature for fine-tuning your system for
+# bottlenecks in: CPU; IO; memory; and IRQs (if irq time accounting is enabled).
 #
 # it is used by some monitoring applications to proactively try to restabilize a system during
 # high contention times, such as oomd, systemd-oomd and nohang[^1]
@@ -610,7 +614,9 @@ _minor=5
 #
 # WARNING: kernel compilation may FAIL if this and _package_headers is set to yes
 #
-# you should leave this on no unless you don't use any BPF/BTF features (such as sched-ext)
+# you should leave this on no unless you don't use any BPF/BTF features
+#
+# software like docker and scx-scheds utilize BTF
 #
 # if unsure, say no
 : "${_no_btf:=no}"
@@ -632,7 +638,7 @@ _minor=5
 
 # disable lockup detection
 #
-# this will disable the detection of soft lockups (interrupt storms), hard lockups[^1], hung tasks (stuck in an uninterruptable 'D' state)
+# this will disable the detection of soft lockups (interrupt storms), hard lockups, hung tasks (stuck in an uninterruptable 'D' state)
 #
 # even if detected, the processor or system will stay locked up. this is only a facility to report such issues.
 #
