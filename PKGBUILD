@@ -17,7 +17,7 @@
 #
 # consider `git fetch && git pull` if you're updating the kernel instead
 _major=6.15
-_minor=5
+_minor=6
 
 # include cachyos patchset?
 #
