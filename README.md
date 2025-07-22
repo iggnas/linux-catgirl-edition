@@ -1,6 +1,6 @@
 # The Linux Catgirl Edition kernel
 
-A custom Linux build system forked from the work by [CachyOS](https://github.com/linux-cachyos), aiming to provide the foundation for compiling highly scalable Linux systems.
+A custom Linux build system forked from the work by [CachyOS](https://github.com/cachyos/linux-cachyos), aiming to provide the foundation for compiling highly scalable Linux systems.
 
 To achieve this goal, we provide the option to disable certain Linux kernel features and pull in certain patches.
 
