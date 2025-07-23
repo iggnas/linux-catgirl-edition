@@ -1256,7 +1256,9 @@ prepare() {
             -d DEBUG_BOOT_PARAMS \
             -d DEBUG_RODATA_TEST \
             -d SCSI_CONSTANTS \
-            -d SCSI_LOGGING
+            -d SCSI_LOGGING \
+            -d ZSMALLOC_STAT \
+            -d CONFIG_DEBUG_FS \
 
         # TODO: does BLK_DEBUG_FS disable changing io scheduler at runtime?
     fi
