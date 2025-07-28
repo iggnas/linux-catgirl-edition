@@ -988,8 +988,8 @@ prepare() {
             --set-str DEFAULT_TCP_CONG bbr \
             -m NET_SCH_FQ_CODEL \
             -e NET_SCH_FQ \
-            -d DEFAULT_FQ_CODEL \
-            -e DEFAULT_FQ
+            -d CONFIG_DEFAULT_FQ_CODEL \
+            -e CONFIG_DEFAULT_FQ
     fi
 
     # Select THP
