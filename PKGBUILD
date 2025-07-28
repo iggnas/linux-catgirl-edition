@@ -16,8 +16,8 @@
 # only change this if you need a specific kernel. make sure to run `rm *.patch` prior to ensure you have the right patches
 #
 # consider `git fetch && git pull` if you're updating the kernel instead
-_major=6.15
-_minor=7
+_major=6.16
+_minor=
 
 # include cachyos patchset?
 #
@@ -792,7 +792,7 @@ _pkgsuffix=catgirl-edition
 pkgbase="linux-$_pkgsuffix"
 #_minorc=$((_minor+1))
 #_rcver=rc8
-pkgver=${_major}.${_minor}
+pkgver=${_major}${_minor}
 #_stable=${_major}.${_minor}
 _stable=${_major}
 #_stablerc=${_major}-${_rcver}
