@@ -975,22 +975,6 @@ prepare() {
             -e CC_OPTIMIZE_FOR_PERFORMANCE_O3
     fi
 
-    ### CI-only stuff
-    # if [[ -n "$CI" || -n "$GITHUB_RUN_ID" ]]; then
-    #     echo "Detected build inside CI"
-    #     scripts/config -d CC_OPTIMIZE_FOR_PERFORMANCE \
-    #         -d CC_OPTIMIZE_FOR_PERFORMANCE_O3 \
-    #         -e CC_OPTIMIZE_FOR_SIZE \
-    #         -d SLUB_DEBUG \
-    #         -d PM_DEBUG \
-    #         -d PM_ADVANCED_DEBUG \
-    #         -d PM_SLEEP_DEBUG \
-    #         -d ACPI_DEBUG \
-    #         -d LATENCYTOP \
-    #         -d SCHED_DEBUG \
-    #         -d DEBUG_PREEMPT
-    # fi
-
     # Enable bbr3
     if [ "$_tcp_bbr3" = "yes" ]; then
         echo "Disabling TCP_CONG_CUBIC..."
