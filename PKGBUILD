@@ -603,6 +603,14 @@ _minor=
 # if unsure, say yes
 : "${_disable_debugging:=yes}"
 
+# disable debugfs
+#
+# depends on `_disable_debugging`
+#
+# attempts to disable the debugfs, provided no other options depend on it.
+# powertop seems to depend on this option.
+: "${_disable_debugfs:=no}"
+
 # disable ACPI Platform Error Interface (APEI)
 #
 # APEI allows error reporting to the OS. It improves NMI handling should it occur, but if you encounter these, i'd say you
@@ -1254,10 +1262,14 @@ prepare() {
             -d DEBUG_RODATA_TEST \
             -d SCSI_CONSTANTS \
             -d SCSI_LOGGING \
-            -d ZSMALLOC_STAT \
-            -d CONFIG_DEBUG_FS \
+            -d ZSMALLOC_STAT
 
         # TODO: does BLK_DEBUG_FS disable changing io scheduler at runtime?
+    fi
+
+    if [ "$_disable_debugfs" = "yes" ]; then
+        echo "Disable debugfs"
+        scripts/config -d DEBUG_FS
     fi
 
     if [ "$_disable_apei" = "yes" ]; then
