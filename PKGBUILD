@@ -19,16 +19,15 @@
 _major=6.16
 _minor=
 
-# include cachyos patchset?
-#
-# generally, you should keep this enabled
+# note that only one of these patchsets may co-exist at once. we are working to potentally allow more of these to co-exist.
+
+# include cachyos patchset
 : "${_import_cachyos_patchset:=yes}"
 
-
-# include clear linux patches?
+# include partial clear linux[^1] patches
 #
-# generally, you should keep this enabled
-: "${_import_clear_patchset:=yes}"
+# [^1]: community maintained clearlinux patchset: https://git.staropensource.de/StarOpenSource/Linux-Tachyon
+: "${_import_clear_patchset:=no}"
 
 # select a CPU scheduler
 #
@@ -826,7 +825,9 @@ makedepends=(
 )
 
 _patchsource_cachyos="https://raw.githubusercontent.com/cachyos/kernel-patches/master/${_major}"
-_patchsource_custom="https://raw.githubusercontent.com/iggnas/linux-catgirl-edition/refs/heads/master/patches"
+                                                                                # TODO: update `dev` to `master`
+                                                                                # when time comes
+_patchsource_custom="https://raw.githubusercontent.com/a-catgirl-dev/linux-catgirl-edition/refs/heads/dev/patches"
 _nv_ver=575.57.08
 _nv_pkg="NVIDIA-Linux-x86_64-${_nv_ver}"
 _nv_open_pkg="NVIDIA-kernel-module-source-${_nv_ver}"
@@ -836,7 +837,7 @@ source=(
     "${_patchsource_cachyos}/all/0001-cachyos-base-all.patch")
 
 # apply clear linux patchset
-if [ "${_import_xanmod_patchset:=yes}" = "yes" ]; then
+if [ "${_import_clear_patchset:=yes}" = "yes" ]; then
     source+=("${_patchsource_custom}/clear-linux-patchset.patch")
 fi
 
