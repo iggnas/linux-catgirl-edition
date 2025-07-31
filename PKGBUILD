@@ -29,6 +29,11 @@ _minor=
 # [^1]: community maintained clearlinux patchset: https://git.staropensource.de/StarOpenSource/Linux-Tachyon
 : "${_import_clear_patchset:=no}"
 
+# include partial xanmod[^1] patches
+#
+# [^1]: https://gitlab.com/xanmod/linux-patches
+: "${_import_xanmod_patchset:=no}"
+
 # select a CPU scheduler
 #
 # possible options & explaination:
@@ -847,6 +852,11 @@ source=(
 # apply clear linux patchset
 if [ "${_import_clear_patchset:=yes}" = "yes" ]; then
     source+=("${_patchsource_custom}/clear-linux-patchset.patch")
+fi
+
+# apply xanmod patchset
+if [ "${_import_xanmod_patchset:=yes}" = "yes" ]; then
+    source+=("${_patchsource_custom}/xanmod-patchset.patch")
 fi
 
 # LLVM makedepends
