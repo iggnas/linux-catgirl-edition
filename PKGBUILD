@@ -836,9 +836,9 @@ makedepends=(
 )
 
 _patchsource_cachyos="https://raw.githubusercontent.com/cachyos/kernel-patches/master/${_major}"
+_patchsource_xanmod="https://gitlab.com/xanmod/linux-patches/-/raw/master/linux-6.16.y-xanmod"
                                                                                 # TODO: update `dev` to `master`
                                                                                 # when time comes
-_patchsource_xanmod="https://gitlab.com/xanmod/linux-patches/-/raw/master/linux-6.15.y-xanmod" # 6.16 isn't out yet
 _patchsource_clear="https://raw.githubusercontent.com/a-catgirl-dev/linux-catgirl-edition/refs/heads/dev/patches" # change this to clears' own URL
 _nv_ver=575.57.08
 _nv_pkg="NVIDIA-Linux-x86_64-${_nv_ver}"
@@ -857,9 +857,9 @@ fi
 # apply xanmod patchset
 if [ "${_import_xanmod_patchset:=yes}" = "yes" ]; then
     source+=(
-    "${_patchsource_xanmod}/xanmod/0009-XANMOD-block-Set-rq_affinity-to-force-complete-I-O-r.patch"
-    "${_patchsource_xanmod}/xanmod/0013-XANMOD-mm-Raise-max_map_count-default-value.patch"
-    "${_patchsource_xanmod}/xanmod/0015-XANMOD-sched-autogroup-Add-kernel-parameter-and-conf.patch"
+    "${_patchsource_xanmod}/xanmod/0010-XANMOD-block-Set-rq_affinity-to-force-complete-I-O-r.patch"
+    "${_patchsource_xanmod}/xanmod/0014-XANMOD-mm-Raise-max_map_count-default-value.patch"
+    "${_patchsource_xanmod}/xanmod/0016-XANMOD-sched-autogroup-Add-kernel-parameter-and-conf.patch"
     )
 fi
 
