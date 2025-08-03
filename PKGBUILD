@@ -19,7 +19,8 @@
 _major=6.16
 _minor=
 
-# note that only one of these patchsets may co-exist at once. we are working to potentally allow more of these to co-exist.
+# these patchsets may co-exist all at once, but regressions may occur.
+# if you are unsure, select only `_import_cachyos_patchset`
 
 # include cachyos patchset
 : "${_import_cachyos_patchset:=yes}"
@@ -851,7 +852,7 @@ source=(
 
 # apply clear linux patchset
 if [ "${_import_clear_patchset:=yes}" = "yes" ]; then
-    source+=("${_patchsource_custom}/clear-linux-patchset.patch")
+    source+=("${_patchsource_clear}/clear-linux-patchset.patch")
 fi
 
 # apply xanmod patchset
