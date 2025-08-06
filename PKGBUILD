@@ -1,25 +1,28 @@
-# attributions:
+# attribution:
 # **cachyos** for the base pkgbuild that i have heavily modified
 # **linux-tkg** for their pkgbuilds
 
-# set the following variables to anything but null
+# The comments above each variable include useful documentation as I understand it. Read throughly, and do your own
+# research if needed.
 #
-# the comments above the options offer documentation. read throughly, and do research if needed
-# if unsure, ask the maintainers:
-# nyameowmeow at duck dot com
-# xxdr at duck dot com
+# If you are unsure, feel free to ask the maintainers, via email:
+# - paws [at] a-catgirl [dot] dev
+# - xxdr [at] duck [dot] com
+# or alternatively via github issues:
+# - https://github.com/a-catgirl-dev/linux-catgirl-edition/issues/new/choose
 
-# make sure to read all of the possible configuration options. there may be some things you want enabled or disabled.
-# don't blindly `makepkg -scf --cleanbuild --skipchecksums` the kernel (though you could, just, its not the best)
+# when you are done with configuration, execute `makepkg -scf --cleanbuild --skipchecksums` to begin the build.
 
-# kernel version
-# only change this if you need a specific kernel. make sure to run `rm *.patch` prior to ensure you have the right patches
+# if you change this, you will want to execute `rm *.patch` to ensure the kernel is patched properly
 #
-# consider `git fetch && git pull` if you're updating the kernel instead
+# if you are updating the kernel, consider running `git stash && git fetch && git pull && git stash pop` instead
+# of updating these values
 _major=6.16
 _minor=
 
-# these patchsets may co-exist all at once, but regressions may occur.
+# select custom patchset(s)
+#
+# these patchsets can apply together, but regressions may occur.
 # if you are unsure, select only `_import_cachyos_patchset`
 
 # include cachyos patchset
