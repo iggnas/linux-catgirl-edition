@@ -33,6 +33,26 @@ _minor=
 # include partial xanmod patches
 : "${_import_xanmod_patchset:=no}"
 
+# patchset specific tweaks
+
+# prevent sleep demotion (PSD) (depends on `_import_clear_patchset`)
+#
+# PSD is a custom clearlinux feature to prevent the CPU[^1] from entering a deep sleep state (think C1E) immediately
+# after disk IO begins, but wait for a bit _before_ sleeping.
+#
+# This can reduce latency on high end NVMe SSDs, possibly on a RAID configuration, but some consumer NVMe drives
+# may also benefit, but to a lesser extent.
+#
+# If your storage device is not fast (SATA SSD or HDD), this will not improve or regress performance or energy
+# effiency[^2], but one may want to disable this to remove unneeded kernel infrastructure _if_ the clearlinux
+# patchset is included
+#
+# If unsure, say yes
+#
+# [^1]: Intel has found that ~85-90% of IO are serviced by the same CPU/Processor that issued them
+# [^2]: Unless you happen to have a slow NVMe drive, for whatever reason
+: "${_clearlinux_prevent_sleep_demotion:=yes}"
+
 # select a CPU scheduler
 #
 # possible options & explaination:
@@ -1053,7 +1073,11 @@ prepare() {
     # needed for certain tweaks
     scripts/config -e EXPERT
 
-    # if [ "$_supported_cpu_vendor" ]
+    if [ "$_clearlinux_prevent_sleep_demotion" = "yes" ]; then
+        echo "Prevent sleep demotion"
+        scripts/config -e CPU_IDLE_PSD
+    fi
+
     scripts/config -e CONFIG_PROCESSOR_SELECT
     case "$_supported_cpu_vendor" in
         all) ;; # nothing, already enabled
