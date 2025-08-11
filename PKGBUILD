@@ -216,7 +216,7 @@ _minor=
 # kernel makefiles, except when explicitly used when set by `kernel_fpu_begin()` and terminated by `kernel_fpu_end()`
 # note that CRC routines contain optimized copies irrespective of this option, so if you use LUKS this option is mostly optional
 #
-# if unsure, say `generic`
+# if unsure, say `x86-64` (baseline x86 instructions)
 #
 # [^1]: the kernel doesn't seem to utilize x86-64-v4 code, hence, it'd possibly break stuff if you set to x86-64-v4
 # [^2]: WTF amd? why not `zen4` or `jaugar`? wtf is "btver2"?
