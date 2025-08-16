@@ -18,7 +18,7 @@
 # if you are updating the kernel, consider running `git stash && git fetch && git pull && git stash pop` instead
 # of updating these values
 _major=6.16
-_minor=
+_minor=.1
 
 # select custom patchset(s)
 #
@@ -861,10 +861,8 @@ makedepends=(
 
 _patchsource_cachyos="https://raw.githubusercontent.com/cachyos/kernel-patches/master/${_major}"
 _patchsource_xanmod="https://gitlab.com/xanmod/linux-patches/-/raw/master/linux-6.16.y-xanmod"
-                                                                                # TODO: update `dev` to `master`
-                                                                                # when time comes
 _patchsource_clear="https://raw.githubusercontent.com/a-catgirl-dev/linux-catgirl-edition/refs/heads/dev/patches" # change this to clears' own URL
-_nv_ver=575.57.08
+_nv_ver=580.76.05
 _nv_pkg="NVIDIA-Linux-x86_64-${_nv_ver}"
 _nv_open_pkg="NVIDIA-kernel-module-source-${_nv_ver}"
 source=(
