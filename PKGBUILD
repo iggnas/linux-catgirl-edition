@@ -31,10 +31,10 @@ _minor=.3
 # include partial clear linux[^1] patches
 #
 # [^1]: community maintained clearlinux patchset: https://git.staropensource.de/StarOpenSource/Linux-Tachyon
-: "${_import_clear_patchset:=no}"
+: "${_import_clear_patchset:=yes}"
 
 # include partial xanmod patches
-: "${_import_xanmod_patchset:=no}"
+: "${_import_xanmod_patchset:=yes}"
 
 # patchset specific tweaks
 
@@ -148,7 +148,7 @@ _minor=.3
 # [^1]: this may hurt performance on systems with many cores where many timer interrupts are occuring
 #
 # if unsure, select 1000
-: "${_HZ_ticks:=1000}"
+: "${_HZ_ticks:=750}"
 
 # kernel tickrate
 #
@@ -159,7 +159,7 @@ _minor=.3
 # periodic is suitable for real-time systems, but is not power efficient at all.
 #
 # if unsure, select idle
-: "${_tickrate:=idle}"
+: "${_tickrate:=full}"
 
 # kernel preemption mode
 #
@@ -220,7 +220,7 @@ _minor=.3
 #
 # [^1]: the kernel doesn't seem to utilize x86-64-v4 code, hence, it'd possibly break stuff if you set to x86-64-v4
 # [^2]: WTF amd? why not `zen4` or `jaugar`? wtf is "btver2"?
-: "${_processor_opt:=x86-64}"
+: "${_processor_opt:=native}"
 
 # supported cpu processor vendors
 #
@@ -240,7 +240,7 @@ _minor=.3
 #       disabled on arch linux. do it yourself
 # [^2]: techinically `all` won't actually do anything, because by default
 #       the config file has them enabled by default.
-: "${_supported_cpu_vendor:=all}"
+: "${_supported_cpu_vendor:=intel}"
 
 # clang LTO mode
 #
@@ -368,7 +368,7 @@ _minor=.3
 # [^1]: kernel documentation says "The overhead for each GPU is very small." might not be worth it?
 #       adding the option because i have a low memory machine i want to squeeze every last byte out
 #       of it.
-: "${_maximum_gpus:=10}"
+: "${_maximum_gpus:=1}"
 
 # maximum amount of CPUs supported
 #
@@ -384,7 +384,7 @@ _minor=.3
 #
 # [^1]: CPUs in this case does not refer to physical CPU packages. it refers to threads[^2]. WTF torvalds?
 # [^2]: if your CPU does not have hyperthreading/symmetrical multithreading, then use cores.
-: "${_maximum_cpus:=default}"
+: "${_maximum_cpus:=28}"
 
 # disable FUSE support
 #
